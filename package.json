@@ -35,8 +35,8 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@bitauth/libauth": "^1.17.1",
-    "@types/node": "^16.9.1"
+    "@types/node": "^16.9.1",
+    "graphql-request": "^3.5.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.15.6",
