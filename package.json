@@ -42,7 +42,8 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@bitauth/libauth": "^1.17.1"
+    "@bitauth/libauth": "^1.17.1",
+    "@types/node": "^16.9.1"
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
