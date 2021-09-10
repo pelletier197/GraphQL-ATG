@@ -1,6 +1,7 @@
 import { testFunction } from '@lib/test'
-import test from 'ava'
 
-test('getABC', (t) => {
-  t.is(testFunction(), 4)
+describe('test', () => {
+  it('should work', () => {
+    expect(testFunction()).toBe(4)
+  })
 })
