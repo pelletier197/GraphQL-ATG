@@ -39,7 +39,7 @@
       "@lib/*": ["src/lib/*"]
     }
   },
-  "include": ["src/**/*.ts", "spec/**/*.spec.ts"],
+  "include": ["src/**/*.ts", "spec/**/*.spec.ts", "spec/lib/infrastructure/farmServer.spec.ts"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }
