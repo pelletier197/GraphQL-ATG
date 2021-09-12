@@ -1,4 +1,3 @@
-import { GraphQLClient } from '@lib/core/graphql/client'
 import { createClient } from '@lib/infrastructure/graphql/client'
 
 import {

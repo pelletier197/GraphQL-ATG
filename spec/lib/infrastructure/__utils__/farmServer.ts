@@ -29,7 +29,7 @@ export type Vegetable = {
   readonly cookingModes: ReadonlyArray<CookingMode>
 }
 
-const schema = `
+const schema = gql`
   type Query {
     farm: Farm!
   }
@@ -119,7 +119,7 @@ const ALL_ANIMALS: ReadonlyArray<Animal> = [
   },
 ]
 
-export const QUERY_ALL_ANIMALS = `
+export const QUERY_ALL_ANIMALS = gql`
   {
     farm {
       animals {
@@ -131,7 +131,7 @@ export const QUERY_ALL_ANIMALS = `
             sound
             baby {
               name
-              sound,
+              sound
               baby {
                 name
                 sound
