@@ -1,5 +1,6 @@
 import type { IResolvers } from '@graphql-tools/utils'
 import { ApolloServer } from 'apollo-server'
+import findFreePorts from 'find-free-ports'
 
 export type TestGraphQLServer = {
   readonly url: string
@@ -20,7 +21,9 @@ export async function startTestServer(
     resolvers: resolvers,
   })
 
-  const started = await server.listen()
+  const started = await server.listen({
+    port: (await findFreePorts(1))[0],
+  })
   return {
     url: started.url,
     manager: {
