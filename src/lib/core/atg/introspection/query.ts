@@ -1,7 +1,7 @@
 import gql from '@lib/core/graphql/gql'
 
 const INTROSPECTION_QUERY = gql`
-  query IntrospectionQuery {
+  query IntrospectionQuery($includeDeprecated: boolean) {
     __schema {
       queryType {
         name
