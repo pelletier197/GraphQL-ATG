@@ -1,6 +1,6 @@
 import gql from '@lib/core/graphql/gql'
 
-const INTROSPECTION_QUERY = gql`
+export const INTROSPECTION_QUERY = gql`
   query IntrospectionQuery($includeDeprecated: boolean) {
     __schema {
       queryType {
@@ -30,7 +30,7 @@ const INTROSPECTION_QUERY = gql`
     kind
     name
     description
-    fields(includeDeprecated: true) {
+    fields(includeDeprecated: $includeDeprecated) {
       name
       description
       args {
@@ -48,7 +48,7 @@ const INTROSPECTION_QUERY = gql`
     interfaces {
       ...TypeRef
     }
-    enumValues(includeDeprecated: true) {
+    enumValues(includeDeprecated: $includeDeprecated) {
       name
       description
       isDeprecated
