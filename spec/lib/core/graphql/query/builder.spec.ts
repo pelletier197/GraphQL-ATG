@@ -19,13 +19,20 @@ describe('building a query', () => {
       const result = underTest.withField('field', []).build()
 
       it('should generate the right request', () => {
+        console.log(prettify(result.query))
+        console.log(
+          prettify(gql`
+            query {
+              field
+            }
+          `)
+        )
+
         expect(prettify(result.query)).toEqual(
           prettify(
             gql`
-              {
-                query {
-                  field
-                }
+              query {
+                field
               }
             `
           )

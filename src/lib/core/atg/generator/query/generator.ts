@@ -39,8 +39,6 @@ function generateQuery(
   }
 }
 
-function generateFieldRecursive
-
 function getType(
   typeName: string,
   typesByName: TypesByName,
