@@ -21,7 +21,7 @@ export async function introspect(
   )
 
   if (!result.data) {
-    throw Error('expected introspection result to contain data, but did not')
+    throw new Error('expected introspection result to contain data, but did not')
   }
   
   return result.data
