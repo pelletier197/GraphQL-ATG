@@ -1,6 +1,7 @@
 import { GraphQLIntrospectionResult } from '@lib/core/atg/introspection/types'
 import gql from '@lib/core/graphql/gql'
 import omitDeep from 'omit-deep-lodash'
+import { lazy } from '../lazy'
 
 import { startTestServer, TestGraphQLServer } from '../server'
 
@@ -297,6 +298,12 @@ const resolvers = {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const INTROSPECTION_SCHEMA: GraphQLIntrospectionResult = require('./schema.json')
 
-export async function startFarmServer(): Promise<TestGraphQLServer> {
-  return startTestServer(schema, resolvers)
+// Creates a singleton server that is re-used across tests and closed at the end
+const server = lazy(() => startTestServer(schema, resolvers))
+process.on('exit', () => server().then((server) => server.manager.stop()))
+
+export async function startFarmServer(): Promise<
+  Pick<TestGraphQLServer, 'url'>
+> {
+  return server()
 }

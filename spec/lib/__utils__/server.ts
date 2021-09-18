@@ -24,6 +24,7 @@ export async function startTestServer(
   const started = await server.listen({
     port: (await findFreePorts(1))[0],
   })
+
   return {
     url: started.url,
     manager: {
