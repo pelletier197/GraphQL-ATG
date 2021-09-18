@@ -10,6 +10,10 @@ import { lazy } from '@test/__utils__/lazy'
 const server = lazy(startFarmServer)
 const client = lazy(async () => createClient((await server()).url))
 
+afterAll(async () => {
+  ;(await server()).manager.stop()
+})
+
 describe('running a request to the server', () => {
   describe('the request has no errors', () => {
     it('should have no errors', async () => {

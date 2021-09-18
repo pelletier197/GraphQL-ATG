@@ -7,7 +7,6 @@ export function lazy<T>(callback: () => Promise<T>): () => Promise<T> {
   return async () => {
     if (!init) {
       value = await callback()
-
       init = true
     }
 

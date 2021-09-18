@@ -1,7 +1,6 @@
 {
   "version": "0.2.0",
   "configurations": [
-    // To debug, make sure a *.spec.ts file is active in the editor, then run a configuration
     {
       "type": "node",
       "request": "launch",
@@ -12,10 +11,8 @@
       "outputCapture": "std",
       "skipFiles": ["<node_internals>/**/*.js"],
       "preLaunchTask": "npm: build"
-      // "smartStep": true
     },
     {
-      // Use this one if you're already running `yarn watch`
       "type": "node",
       "request": "launch",
       "name": "Debug Active Spec (no build)",
@@ -24,6 +21,17 @@
       "port": 9229,
       "outputCapture": "std",
       "skipFiles": ["<node_internals>/**/*.js"]
-      // "smartStep": true
-    }]
+    },
+    {
+      "type": "node",
+      "name": "vscode-jest-tests",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "yarn",
+      "args": ["jest", "--runInBand", "--watchAll=false"]
+    }
+  ]
 }

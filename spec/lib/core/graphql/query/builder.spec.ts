@@ -15,24 +15,47 @@ describe('building a query', () => {
       expect(underTest.withField('name', [])).not.toBe(underTest)
     })
 
-    describe('field has no arguments and not sub-selection', () => {
+    describe('field has no arguments and no sub-selection', () => {
       const result = underTest.withField('field', []).build()
 
       it('should generate the right request', () => {
-        console.log(prettify(result.query))
-        console.log(
-          prettify(gql`
-            query {
-              field
-            }
-          `)
-        )
-
         expect(prettify(result.query)).toEqual(
           prettify(
             gql`
               query {
                 field
+              }
+            `
+          )
+        )
+      })
+    })
+
+    describe('field has arguments and no sub-selection', () => {
+      const result = underTest
+        .withField('field', [
+          {
+            name: 'vegetable',
+            type: 'VegetableInput',
+            value: {
+              name: 'Potato',
+              bestVegetableInTheWorld: true,
+            },
+          },
+          {
+            name: 'name',
+            type: 'String!',
+            value: 'Raw veggies',
+          },
+        ])
+        .build()
+
+      it('should generate the right request', () => {
+        expect(prettify(result.query)).toEqual(
+          prettify(
+            gql`
+              query ($vegetable: VegetableInput, $name: String!) {
+                field(vegetable: $vegetable, name: $name)
               }
             `
           )

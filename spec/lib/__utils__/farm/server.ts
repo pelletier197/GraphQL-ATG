@@ -298,12 +298,6 @@ const resolvers = {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const INTROSPECTION_SCHEMA: GraphQLIntrospectionResult = require('./schema.json')
 
-// Creates a singleton server that is re-used across tests and closed at the end
-const server = lazy(() => startTestServer(schema, resolvers))
-process.on('exit', () => server().then((server) => server.manager.stop()))
-
-export async function startFarmServer(): Promise<
-  Pick<TestGraphQLServer, 'url'>
-> {
-  return server()
+export function startFarmServer(): Promise<TestGraphQLServer> {
+  return startTestServer(schema, resolvers)
 }
