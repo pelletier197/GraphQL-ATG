@@ -1,13 +1,17 @@
-import { format } from 'graphql-formatter'
 import compress from 'graphql-query-compress'
 import { gql as implementation } from 'graphql-request'
+import prettierGraphql from 'prettier/parser-graphql'
+import prettier from 'prettier/standalone'
 
 export default function (chunks: TemplateStringsArray): string {
   return implementation(chunks)
 }
 
 export function prettify(request: string): string {
-  return format(request)
+  return prettier.format(request, {
+    parser: 'graphql',
+    plugins: [prettierGraphql],
+  })
 }
 
 export function minify(request: string): string {

@@ -1,7 +1,7 @@
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/no-class */
 import _ from 'lodash'
-import { GraphQLVariables } from '../client'
+
 import { GraphQLQuery } from './query'
 
 export enum QueryType {
@@ -9,23 +9,22 @@ export enum QueryType {
   MUTATION = 'mutation',
 }
 
-export type Argument = {
+export type Parameter = {
   readonly name: string
   readonly type: string
   readonly value: unknown
 }
 
-type BuilderFields = Record<
-  string,
-  {
-    readonly args: ReadonlyArray<Argument>
-    readonly subSelection?: QueryBuilder
-  }
->
+type BuilderField = {
+  readonly parameters: ReadonlyArray<Parameter>
+  readonly subSelection?: QueryBuilder
+}
+
+type BuilderFields = Record<string, BuilderField>
 
 type QuerySubSelection = {
   readonly query: string
-  readonly variables: ReadonlyArray<Argument>
+  readonly variables: ReadonlyArray<Parameter>
 }
 
 export class QueryBuilder {
@@ -40,7 +39,7 @@ export class QueryBuilder {
 
   withField(
     name: string,
-    args: ReadonlyArray<Argument>,
+    parameters: ReadonlyArray<Parameter>,
     subSelection?: QueryBuilder
   ): QueryBuilder {
     name = name.trim()
@@ -52,41 +51,91 @@ export class QueryBuilder {
     return new QueryBuilder(this.type, {
       ...this.fields,
       [name]: {
-        args,
+        parameters,
         subSelection,
       },
     })
   }
 
   build(): GraphQLQuery {
-    if (_.size(this.fields) === 0) {
-      throw new Error(
-        'Cannot generate a query for no fields. A minimum of one field must be queried'
-      )
-    }
-
     const subSelection = this.buildSelection()
-    const variablesString = subSelection.variables.map(
-      (variable) => `$${variable.name}:${variable.type}`
+    const variablePlaceholder = this.generateArgumentPlaceholder(
+      subSelection.variables
     )
-
-    const variablePlaceholder =
-      variablesString.length === 0 ? '' : `(${variablesString})`
 
     return {
       query: `${this.type} ${this.name}${variablePlaceholder}${subSelection.query}`,
       variables: _.mapValues(
-        _.keyBy(subSelection.variables, (variable: Argument) => variable.name),
-        (variable: Argument) => variable.value
+        _.keyBy(subSelection.variables, (variable: Parameter) => variable.name),
+        (variable: Parameter) => variable.value
       ),
     }
   }
 
   private buildSelection(): QuerySubSelection {
-    return {
-      query: '',
-      variables: [],
+    if (!this.hasFields()) {
+      throw new Error(
+        'Cannot generate a sub-selection with no fields in it. A minimum of one field must be queried if the sub-selection is defined.'
+      )
     }
+
+    type BuiltSubSelection = {
+      readonly parameters: ReadonlyArray<Parameter>
+      readonly subSelection?: QuerySubSelection
+    }
+
+    const mappedFields: Record<string, BuiltSubSelection> = _.mapValues(
+      this.fields,
+      (field: BuilderField) => ({
+        parameters: field.parameters,
+        subSelection: field.subSelection?.buildSelection(),
+      })
+    )
+
+    const fieldsAsQueries: ReadonlyArray<string> = Object.keys(
+      mappedFields
+    ).map((name: string) => {
+      const value = mappedFields[name]
+
+      // TODO parameter variable name should not be the same as the variable. We might try to use the same parameter for two things
+      const parametersString = value.parameters
+        .map((parameter: Parameter) => `${parameter.name}: $${parameter.name}`)
+        .join(', ')
+
+      const parameterPlaceholder =
+        parametersString.length === 0 ? '' : `(${parametersString})`
+
+      return `${name}${parameterPlaceholder}${value.subSelection?.query ?? ''}`
+    })
+
+    const allQueryVariablesRequiredNested: ReadonlyArray<Parameter> = _.flatMap(
+      Object.keys(mappedFields).map(
+        (name: string) => mappedFields[name].parameters
+      )
+    )
+
+    return {
+      query: `
+        {
+          ${fieldsAsQueries.join('\n')}
+        }
+      `,
+      variables: allQueryVariablesRequiredNested,
+    }
+  }
+
+  private generateArgumentPlaceholder(
+    variables: ReadonlyArray<Parameter>
+  ): string {
+    const variablesString = variables
+      .map((variable) => `$${variable.name}:${variable.type}`)
+      .join(', ')
+
+    return variablesString.length === 0 ? '' : `(${variablesString})`
+  }
+
+  private hasFields(): boolean {
+    return _.size(this.fields) !== 0
   }
 }
 

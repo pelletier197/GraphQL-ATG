@@ -37,10 +37,10 @@
   "dependencies": {
     "@types/node": "^16.9.1",
     "deasync": "^0.1.23",
-    "graphql-formatter": "^1.0.3",
     "graphql-query-compress": "^1.2.4",
     "graphql-request": "^3.5.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "prettier": "^2.4.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.15.6",
@@ -66,7 +66,6 @@
     "npm-run-all": "^4.1.5",
     "omit-deep-lodash": "^1.1.5",
     "open-cli": "^6.0.1",
-    "prettier": "^2.4.0",
     "standard-version": "^9.0.0",
     "ts-jest": "^27.0.5",
     "ts-node": "^9.0.0",
