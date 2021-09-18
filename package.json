@@ -37,6 +37,7 @@
   "dependencies": {
     "@types/node": "^16.9.1",
     "deasync": "^0.1.23",
+    "graphql-formatter": "^1.0.3",
     "graphql-query-compress": "^1.2.4",
     "graphql-request": "^3.5.0",
     "lodash": "^4.17.21",
@@ -83,6 +84,7 @@
   ],
   "jest": {
     "verbose": true,
+    "maxWorkers": 1,
     "testMatch": [
       "**/*.spec.ts"
     ],

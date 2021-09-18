@@ -1,7 +1,6 @@
 import { GraphQLIntrospectionResult } from '@lib/core/atg/introspection/types'
 import gql from '@lib/core/graphql/gql'
 import omitDeep from 'omit-deep-lodash'
-import { lazy } from '../lazy'
 
 import { startTestServer, TestGraphQLServer } from '../server'
 
@@ -298,6 +297,6 @@ const resolvers = {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const INTROSPECTION_SCHEMA: GraphQLIntrospectionResult = require('./schema.json')
 
-export function startFarmServer(): Promise<TestGraphQLServer> {
+export async function startFarmServer(): Promise<TestGraphQLServer> {
   return startTestServer(schema, resolvers)
 }
