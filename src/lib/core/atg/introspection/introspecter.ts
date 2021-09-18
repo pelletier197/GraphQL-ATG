@@ -1,28 +1,31 @@
 import { GraphQLClient } from '@lib/core/graphql/client'
-import { INTROSPECTION_QUERY } from './query'
+import { GraphQLQueryError } from '@lib/core/graphql/error'
+
+import { INTROSPECTION_QUERY, IntrospectionQueryConfig } from './query'
 import { GraphQLIntrospectionResult } from './types'
 
-export type IntrospectionConfig = {
-  readonly includeDeprecated?: boolean
+const DEFAULT_INTROSPECTION_CONFIG: IntrospectionQueryConfig = {
+  includeDeprecated: true,
 }
 
 export async function introspect(
   client: GraphQLClient,
-  config?: IntrospectionConfig
+  config?: Partial<IntrospectionQueryConfig>
 ): Promise<GraphQLIntrospectionResult> {
   const result = await client.request<GraphQLIntrospectionResult>(
     INTROSPECTION_QUERY,
     {
-      includeDeprecated:
-        config?.includeDeprecated === undefined
-          ? true
-          : config.includeDeprecated,
+      ...DEFAULT_INTROSPECTION_CONFIG,
+      ...config,
     }
   )
 
-  if (!result.data) {
-    throw new Error('expected introspection result to contain data, but did not')
+  if (!result.data || result.errors?.length > 0) {
+    throw new GraphQLQueryError(
+      'expected introspection result to contain data and no errors, but did not',
+      result
+    )
   }
-  
+
   return result.data
 }

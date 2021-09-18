@@ -36,7 +36,8 @@
     "typeRoots": ["node_modules/@types", "src/types"],
     "baseUrl": ".",
     "paths": {
-      "@lib/*": ["src/lib/*"]
+      "@lib/*": ["src/lib/*"],
+      "@test/*": ["spec/lib/*"]
     }
   },
   "include": ["src/**/*.ts", "spec/**/*.spec.ts"],

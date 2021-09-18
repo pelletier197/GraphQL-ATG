@@ -90,7 +90,8 @@
       "js"
     ],
     "moduleNameMapper": {
-      "^@lib/(.*)$": "<rootDir>/src/lib/$1"
+      "^@lib/(.*)$": "<rootDir>/src/lib/$1",
+      "^@test/(.*)$": "<rootDir>/spec/lib/$1"
     },
     "coverageReporters": [
       "html",
