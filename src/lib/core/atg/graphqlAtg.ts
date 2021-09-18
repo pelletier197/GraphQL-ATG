@@ -8,7 +8,6 @@ export type GraphQLAtg = {
 
 export function createGraphQLAtg(config: GraphQLAtgConfig): GraphQLAtg {
   const client = createClient(config.endpoint, config.headers)
-  const 
 
   return {
     run: async () => {
