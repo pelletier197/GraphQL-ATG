@@ -15,8 +15,12 @@ export type Parameter = {
   readonly value: unknown
 }
 
+type IdentifiedParameter = Parameter & {
+  readonly id: string
+}
+
 type BuilderField = {
-  readonly parameters: ReadonlyArray<Parameter>
+  readonly parameters: ReadonlyArray<IdentifiedParameter>
   readonly subSelection?: QueryBuilder
 }
 
@@ -51,7 +55,9 @@ export class QueryBuilder {
     return new QueryBuilder(this.type, {
       ...this.fields,
       [name]: {
-        parameters,
+        parameters: parameters.map((parameter) =>
+          this.asUniquelyIdentifiedParameter(parameter)
+        ),
         subSelection,
       },
     })
@@ -80,7 +86,7 @@ export class QueryBuilder {
     }
 
     type BuiltSubSelection = {
-      readonly parameters: ReadonlyArray<Parameter>
+      readonly parameters: ReadonlyArray<IdentifiedParameter>
       readonly subSelection?: QuerySubSelection
     }
 
@@ -99,7 +105,10 @@ export class QueryBuilder {
 
       // TODO parameter variable name should not be the same as the variable. We might try to use the same parameter for two things
       const parametersString = value.parameters
-        .map((parameter: Parameter) => `${parameter.name}: $${parameter.name}`)
+        .map(
+          (parameter: IdentifiedParameter) =>
+            `${parameter.name}: $${parameter.name}`
+        )
         .join(', ')
 
       const parameterPlaceholder =
@@ -136,6 +145,19 @@ export class QueryBuilder {
       .join(', ')
 
     return variablesString.length === 0 ? '' : `(${variablesString})`
+  }
+
+  private asUniquelyIdentifiedParameter(
+    parameter: Parameter
+  ): IdentifiedParameter {
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+    const id = _.sampleSize(characters, 10).join()
+    return {
+      id,
+      ...parameter,
+    }
   }
 
   private hasFields(): boolean {

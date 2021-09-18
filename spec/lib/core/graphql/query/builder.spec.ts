@@ -1,4 +1,4 @@
-import gql, { minify, prettify } from '@lib/core/graphql/gql'
+import gql, { prettify } from '@lib/core/graphql/gql'
 import {
   mutationBuilder,
   queryBuilder,
@@ -159,6 +159,39 @@ describe('building a query', () => {
 
       it('should generate the right request', () => {
         expect(() => builder.build()).toThrowError()
+      })
+    })
+
+    describe('the same variable name is present two times on two different fields', () => {
+      const result = underTest
+        .withField('first', [
+          {
+            name: 'arg',
+            type: 'String!',
+            value: 'value',
+          },
+        ])
+        .withField('second', [
+          {
+            name: 'arg',
+            type: 'Int!',
+            value: 2,
+          },
+        ])
+        .build()
+
+      it('should generate a request that handle the duplicate variable names', () => {
+        console.log(result.query)
+        expect(prettify(result.query)).toEqual(
+          prettify(gql`
+               {
+                   query ($arg: String!, $arg2: Int!) {
+                       first(arg: $arg)
+                       second(arg: $arg2)
+                   }
+                 }
+           `)
+        )
       })
     })
   })
