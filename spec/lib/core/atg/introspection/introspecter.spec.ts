@@ -1,10 +1,8 @@
 import { introspect } from '@lib/core/atg/introspection/introspecter'
-import { INTROSPECTION_QUERY } from '@lib/core/atg/introspection/query'
 import { GraphQLIntrospectionResult } from '@lib/core/atg/introspection/types'
 import { createClient } from '@lib/infrastructure/graphql/client'
 import { startFarmServer } from '@test/__utils__/farmServer'
 import { lazy } from '@test/__utils__/lazy'
-import { type } from 'os'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fullSchema: GraphQLIntrospectionResult = require('./schema.json')
