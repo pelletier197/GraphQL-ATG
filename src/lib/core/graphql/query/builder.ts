@@ -48,10 +48,6 @@ export class QueryBuilder {
   ): QueryBuilder {
     name = name.trim()
 
-    if (name.startsWith('$')) {
-      name = name.replace('$', '')
-    }
-
     return new QueryBuilder(this.type, {
       ...this.fields,
       [name]: {
