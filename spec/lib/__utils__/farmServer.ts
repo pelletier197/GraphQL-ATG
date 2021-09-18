@@ -29,6 +29,11 @@ export type Vegetable = {
   readonly cookingModes: ReadonlyArray<CookingMode>
 }
 
+export type Employee = {
+  name: string
+  salary: number
+}
+
 const schema = gql`
   type Query {
     farm: Farm!
@@ -37,6 +42,23 @@ const schema = gql`
   type Farm {
     animals: Animals!
     vegetables: [Vegetable!]!
+    employees: Employees!
+  }
+
+  type Employees {
+    fullTime: [Employee!]!
+    interns: [Employee!]!
+    unpaidInterns: [Employee!]!
+      @deprecated(reason: "Pay all your employees. Slavery is illegal.")
+  }
+
+  type Employee {
+    name: String
+    salary: Int
+  }
+
+  type Intern {
+    name: String
   }
 
   type Animals {
@@ -66,6 +88,28 @@ const schema = gql`
     FRIED
   }
 `
+
+const ALL_FULLTIME_EMPLOYEES: ReadonlyArray<Employee> = [
+  {
+    name: 'John',
+    salary: 75_000,
+  },
+  {
+    name: 'Alice',
+    salary: 75_000,
+  },
+]
+
+const ALL_INTERNS: ReadonlyArray<Employee> = [
+  {
+    name: 'Sundy',
+    salary: 20_000,
+  },
+  {
+    name: 'The poor intern',
+    salary: 0,
+  },
+]
 
 const ALL_ANIMALS: ReadonlyArray<Animal> = [
   {
@@ -207,6 +251,7 @@ const resolvers = {
   Farm: {
     animals: () => ({}),
     vegetables: () => ALL_VEGETABLES,
+    employees: () => ({}),
   },
   Animals: {
     all: (_: unknown, args: AllAnimalArgs) => {
@@ -217,6 +262,11 @@ const resolvers = {
     herbivore: () => HERBIVORES,
     carnivore: () => CARNIVORES,
     eatable: () => [], // No animal eating here
+  },
+  Employees: {
+    fullTime: () => ALL_FULLTIME_EMPLOYEES,
+    interns: () => ALL_INTERNS,
+    unpaidInterns: () => ALL_INTERNS.filter((intern) => intern.salary === 0),
   },
 }
 

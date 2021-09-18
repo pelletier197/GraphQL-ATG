@@ -9,4 +9,12 @@ afterAll(async () => {
   ;(await server()).manager.stop()
 })
 
-describe('running introspection query on a running server', () => {})
+describe('running introspection query on a running server', () => {
+  describe('and no config is provided', () => {
+
+  })
+
+  describe('and config to ignore deprecated fields is provided', () => {
+    
+  })
+})
