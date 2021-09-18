@@ -2,6 +2,7 @@ import gql from '@lib/core/graphql/gql'
 import omitDeep from 'omit-deep-lodash'
 
 import { startTestServer, TestGraphQLServer } from './server'
+
 enum AnimalNutrition {
   HERBIVORE,
   CARNIVORE,
@@ -30,13 +31,25 @@ export type Vegetable = {
 }
 
 export type Employee = {
-  name: string
-  salary: number
+  readonly name: string
+  readonly salary: number
 }
 
 const schema = gql`
   type Query {
     farm: Farm!
+  }
+
+  type Mutation {
+    farm: FarmMutations!
+  }
+
+  type FarmMutations {
+    animals: AnimalMutations!
+  }
+
+  type AnimalMutations {
+    add(name: String!, sound: String!): Boolean!
   }
 
   type Farm {
@@ -267,6 +280,16 @@ const resolvers = {
     fullTime: () => ALL_FULLTIME_EMPLOYEES,
     interns: () => ALL_INTERNS,
     unpaidInterns: () => ALL_INTERNS.filter((intern) => intern.salary === 0),
+  },
+
+  Mutation: {
+    farm: () => ({}),
+  },
+  FarmMutations: {
+    animals: () => ({}),
+  },
+  AnimalMutations: {
+    add: () => false,
   },
 }
 
