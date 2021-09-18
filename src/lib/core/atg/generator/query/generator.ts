@@ -1,8 +1,14 @@
 import _ from 'lodash'
 
-import { FullType, GraphQLIntrospectionResult } from '../../introspection/types'
+import {
+  Field,
+  FullType,
+  GraphQLIntrospectionResult,
+} from '../../introspection/types'
 import { GraphQLGenerationError } from '../error'
 import { GeneratedGraphQLQuery } from '../generatedQuery'
+
+type TypesByName = Record<string, FullType>
 
 export function generateGraphQLQueries(
   introspectionResult: GraphQLIntrospectionResult
@@ -12,19 +18,28 @@ export function generateGraphQLQueries(
   // There is no query type, so no queries can be generated
   if (!schema.queryType) return []
 
-  const typesByName: Record<string, FullType> = _.keyBy(
-    schema.types,
-    (type) => type.name
-  )
+  const typesByName: TypesByName = _.keyBy(schema.types, (type) => type.name)
 
   const rootQueryType = getRootQueryType(schema.queryType.name, typesByName)
 
-  return []
+  if (!rootQueryType.fields) return []
+
+  return rootQueryType.fields.map((field) => generateQuery(field, typesByName))
+}
+
+function generateQuery(
+  rootField: Field,
+  typesByName: TypesByName
+): GeneratedGraphQLQuery {
+  return {
+    query: '',
+    variables: {},
+  }
 }
 
 function getRootQueryType(
   rootQueryTypeName: string,
-  typesByName: Record<string, FullType>
+  typesByName: TypesByName
 ): FullType {
   const rootQueryType = typesByName[rootQueryTypeName]
 

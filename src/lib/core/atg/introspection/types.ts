@@ -18,23 +18,27 @@ export type FullType = {
   readonly kind: Kind
   readonly name: string
   readonly description?: string
-  readonly fields?: ReadonlyArray<{
-    readonly name: string
-    readonly description?: string
-    readonly args: ReadonlyArray<InputValue>
-    readonly type: TypeRef
-    readonly isDeprecated: boolean
-    readonly deprecationReason?: string
-  }>
+  readonly fields?: ReadonlyArray<Field>
   readonly inputFields: ReadonlyArray<InputValue>
   readonly interfaces: ReadonlyArray<TypeRef>
-  readonly enumValues: ReadonlyArray<{
-    readonly name: string
-    readonly description?: string
-    readonly isDeprecated: boolean
-    readonly deprecationReason?: string
-  }>
+  readonly enumValues: ReadonlyArray<Enum>
   readonly possibleTypes: ReadonlyArray<TypeRef>
+}
+
+export type Field = {
+  readonly name: string
+  readonly description?: string
+  readonly args: ReadonlyArray<InputValue>
+  readonly type: TypeRef
+  readonly isDeprecated: boolean
+  readonly deprecationReason?: string
+}
+
+export type Enum = {
+  readonly name: string
+  readonly description?: string
+  readonly isDeprecated: boolean
+  readonly deprecationReason?: string
 }
 
 export type InputValue = {
