@@ -5,13 +5,15 @@ import {
   FullType,
   GraphQLIntrospectionResult,
 } from '../../introspection/types'
+import { GeneratorConfig } from '../config'
 import { GraphQLGenerationError } from '../error'
 import { GeneratedGraphQLQuery } from '../generatedQuery'
 
 type TypesByName = Record<string, FullType>
 
 export function generateGraphQLQueries(
-  introspectionResult: GraphQLIntrospectionResult
+  introspectionResult: GraphQLIntrospectionResult,
+  config: GeneratorConfig
 ): ReadonlyArray<GeneratedGraphQLQuery> {
   const schema = introspectionResult.__schema
 
@@ -31,6 +33,7 @@ function generateQuery(
   rootField: Field,
   typesByName: TypesByName
 ): GeneratedGraphQLQuery {
+  console.log(rootField)
   return {
     query: '',
     variables: {},

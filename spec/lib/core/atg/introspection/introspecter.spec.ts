@@ -1,11 +1,10 @@
 import { introspect } from '@lib/core/atg/introspection/introspecter'
-import { GraphQLIntrospectionResult } from '@lib/core/atg/introspection/types'
 import { createClient } from '@lib/infrastructure/graphql/client'
-import { startFarmServer } from '@test/__utils__/farmServer'
+import {
+  startFarmServer,
+  INTROSPECTION_SCHEMA,
+} from '@test/__utils__/farm/server'
 import { lazy } from '@test/__utils__/lazy'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fullSchema: GraphQLIntrospectionResult = require('./schema.json')
 
 const server = lazy(startFarmServer)
 const client = lazy(async () => createClient((await server()).url))
@@ -18,7 +17,7 @@ describe('running introspection query on a running server', () => {
   describe('and no config is provided', () => {
     it('should include deprecated fields by default', async () => {
       const result = await introspect(await client())
-      expect(result).toEqual(fullSchema)
+      expect(result).toEqual(INTROSPECTION_SCHEMA)
     })
   })
 
@@ -29,7 +28,7 @@ describe('running introspection query on a running server', () => {
       })
 
       expect(result.__schema.types).toEqual(
-        fullSchema.__schema.types.map((type) => {
+        INTROSPECTION_SCHEMA.__schema.types.map((type) => {
           const fields =
             type.fields?.filter((field) => !field.isDeprecated) ?? null
 
