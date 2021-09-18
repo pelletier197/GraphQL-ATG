@@ -4032,6 +4032,18 @@ graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0,
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
+graphql-formatter@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/graphql-formatter/-/graphql-formatter-1.0.3.tgz#934df6dc051b42d4ee3c06eb4ea33d7ac77e1e13"
+  integrity sha512-glUCD5GkxPUpPjzRPDDJ8ZD+g37m5bq8QP2BxVfyozilfQEPhpYCKN3kycJ+/wC2I13fv54ccYG663eumtHmQA==
+
+graphql-query-compress@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/graphql-query-compress/-/graphql-query-compress-1.2.4.tgz#27c6a21ef4fe0dfaa2ff9d29ca8938a876a55650"
+  integrity sha512-W5SMy8/2RAsC9uMOV9VTwnUkp+8N3BZz6qef6jRCIxOVrVxRBiX2btvpaKrEnPU4nchnc1bCfmMDkEtCRzJUiw==
+  dependencies:
+    tokenizr "1.5.7"
+
 graphql-request@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-3.5.0.tgz#7e69574e15875fb3f660a4b4be3996ecd0bbc8b7"
@@ -6757,6 +6769,11 @@ token-types@^2.0.0:
   dependencies:
     "@tokenizer/token" "^0.1.1"
     ieee754 "^1.2.1"
+
+tokenizr@1.5.7:
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/tokenizr/-/tokenizr-1.5.7.tgz#80702775ac9d61899bd3c60e4c7ac36b9845bcbf"
+  integrity sha512-w6qS6F5PNtY30DxoRD4a7nC7zOlPM2SlpQ4zLhOmqBaB1VCZrlV82bLpc/lKNOdNmrwIwcsJLDcjEJ8f7UG6Mg==
 
 tough-cookie@^4.0.0:
   version "4.0.0"
