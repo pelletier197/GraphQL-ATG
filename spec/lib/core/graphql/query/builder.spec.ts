@@ -1,8 +1,12 @@
-import gql, { prettify } from '@lib/core/graphql/gql'
-import { createQueryBuilder, QueryType } from '@lib/core/graphql/query/builder'
+import gql, { minify, prettify } from '@lib/core/graphql/gql'
+import {
+  mutationBuilder,
+  queryBuilder,
+  subSelectionBuilder,
+} from '@lib/core/graphql/query/builder'
 
 describe('building a query', () => {
-  const underTest = createQueryBuilder(QueryType.QUERY)
+  const underTest = queryBuilder()
 
   describe('generating the query with no fields', () => {
     it('should raise an error', () => {
@@ -62,5 +66,102 @@ describe('building a query', () => {
         )
       })
     })
+
+    describe('adding multiple fields with sub-selection and arguments', () => {
+      const result = underTest
+        .withField('field', [
+          {
+            name: 'vegetable',
+            type: 'VegetableInput',
+            value: {
+              name: 'Potato',
+              bestVegetableInTheWorld: true,
+            },
+          },
+          {
+            name: 'name',
+            type: 'String!',
+            value: 'Raw veggies',
+          },
+        ])
+        .withField(
+          'nestedField',
+          [
+            {
+              name: 'nestedArgument',
+              type: 'String',
+              value: null,
+            },
+          ],
+          subSelectionBuilder().withField(
+            'firstLevel',
+            [],
+            subSelectionBuilder().withField('secondLevel', [
+              {
+                name: 'secondLevelArgument',
+                type: 'Int!',
+                value: 234,
+              },
+            ])
+          )
+        )
+        .build()
+
+      it('should generate the right request', () => {
+        expect(prettify(result.query)).toEqual(
+          prettify(gql`
+            query (
+              $vegetable: VegetableInput
+              $name: String!
+              $nestedArgument: String
+              $secondLevelArgument: Int!
+            ) {
+              field(vegetable: $vegetable, name: $name)
+              nestedField(nestedArgument: $nestedArgument) {
+                firstLevel {
+                  secondLevel(secondLevelArgument: $secondLevelArgument)
+                }
+              }
+            }
+          `)
+        )
+      })
+    })
+
+    describe('sub selection is empty for field', () => {
+      const builder = underTest.withField('field', [], subSelectionBuilder())
+
+      it('should generate the right request', () => {
+        expect(() => builder.build()).toThrowError()
+      })
+    })
+  })
+})
+
+describe('building a mutation', () => {
+  const result = mutationBuilder()
+    .withField(
+      'vegetables',
+      [],
+      subSelectionBuilder().withField('update', [
+        {
+          name: 'name',
+          type: 'String!',
+          value: 'New name',
+        },
+      ])
+    )
+    .build()
+
+  it('should generate a mutation query', () => {
+    expect(prettify(result.query)).toEqual(
+      prettify(gql`
+        mutation ($name: String!) {
+          vegetables {
+            update(name: $name)
+          }
+        }
+      `)
+    )
   })
 })

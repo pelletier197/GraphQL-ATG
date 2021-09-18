@@ -37,6 +37,10 @@ export class QueryBuilder {
     this.fields = fields
   }
 
+  withType(type: QueryType): QueryBuilder {
+    return new QueryBuilder(type, this.fields)
+  }
+
   withField(
     name: string,
     parameters: ReadonlyArray<Parameter>,
@@ -109,9 +113,13 @@ export class QueryBuilder {
     })
 
     const allQueryVariablesRequiredNested: ReadonlyArray<Parameter> = _.flatMap(
-      Object.keys(mappedFields).map(
-        (name: string) => mappedFields[name].parameters
-      )
+      Object.keys(mappedFields).map((name: string) => {
+        const mappedField = mappedFields[name]
+        return [
+          ...mappedField.parameters, // Current field parameters
+          ...(mappedField.subSelection?.variables || []), // Parameters of sub selection
+        ]
+      })
     )
 
     return {
@@ -139,6 +147,14 @@ export class QueryBuilder {
   }
 }
 
-export function createQueryBuilder(type: QueryType): QueryBuilder {
-  return new QueryBuilder(type, {})
+export function queryBuilder(): QueryBuilder {
+  return new QueryBuilder(QueryType.QUERY, {})
+}
+
+export function mutationBuilder(): QueryBuilder {
+  return new QueryBuilder(QueryType.MUTATION, {})
+}
+
+export function subSelectionBuilder(): QueryBuilder {
+  return queryBuilder()
 }
