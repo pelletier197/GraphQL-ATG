@@ -33,6 +33,10 @@ describe('building a query', () => {
           )
         )
       })
+
+      it('should have no arguments', () => {
+        expect(result.variables).toEqual({})
+      })
     })
 
     describe('field has arguments and no sub-selection', () => {
@@ -64,6 +68,16 @@ describe('building a query', () => {
             `
           )
         )
+      })
+
+      it('should set the variables', () => {
+        expect(result.variables).toEqual({
+          vegetable: {
+            name: 'Potato',
+            bestVegetableInTheWorld: true,
+          },
+          name: 'Raw veggies',
+        })
       })
     })
 
@@ -126,6 +140,18 @@ describe('building a query', () => {
           `)
         )
       })
+
+      it('should set the variables', () => {
+        expect(result.variables).toEqual({
+          vegetable: {
+            name: 'Potato',
+            bestVegetableInTheWorld: true,
+          },
+          name: 'Raw veggies',
+          nestedArgument: null,
+          secondLevelArgument: 234,
+        })
+      })
     })
 
     describe('sub selection is empty for field', () => {
@@ -163,5 +189,11 @@ describe('building a mutation', () => {
         }
       `)
     )
+  })
+
+  it('should set the variables', () => {
+    expect(result.variables).toEqual({
+      name: 'New name',
+    })
   })
 })
