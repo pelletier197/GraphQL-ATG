@@ -1,4 +1,4 @@
-import gql, { prettify } from '@lib/core/graphql/gql'
+import gql, { minify, prettify } from '@lib/core/graphql/gql'
 import {
   mutationBuilder,
   queryBuilder,
@@ -237,7 +237,6 @@ describe('building a query', () => {
                 firstLevel {
                   thirdField(arg: $arg3)
                 }
-
                 secondFirstLevel {
                   thirdField(arg: $arg4)
                 }
@@ -286,5 +285,5 @@ describe('building a mutation', () => {
 })
 
 function assertGraphQLQueryEqual(actual: string, expected: string) {
-  expect(prettify(actual)).toEqual(prettify(expected))
+  expect(prettify(minify(actual))).toEqual(prettify(minify(expected)))
 }

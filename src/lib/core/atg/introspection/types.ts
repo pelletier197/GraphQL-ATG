@@ -55,9 +55,12 @@ export type TypeRef = {
 }
 
 export enum Kind {
-  OBJECT,
-  NON_NULL,
-  LIST,
+  OBJECT = 'OBJECT',
+  NON_NULL = 'NON_NULL',
+  LIST = 'LIST',
+  SCALAR = 'SCALAR',
+  INTERFACE = 'INTERFACE',
+  ENUM = 'ENUM',
 }
 
 export type Directive = {
