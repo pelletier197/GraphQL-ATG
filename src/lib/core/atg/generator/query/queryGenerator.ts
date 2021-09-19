@@ -4,7 +4,6 @@ import {
   queryBuilder,
   subSelectionBuilder,
 } from '@lib/core/graphql/query/builder'
-import { isLeafType } from 'graphql'
 import _ from 'lodash'
 
 import { GraphQLQuery } from '../../../graphql/query/query'
@@ -16,6 +15,7 @@ import {
 import { GeneratorConfig } from '../config'
 
 import { getRequiredType, isLeaf, unwrapFieldType } from './extractor'
+import { generateArgsForField } from './fakeGenerator'
 import { TypesByName } from './types'
 
 export function generateGraphQLQueries(
@@ -85,8 +85,11 @@ function buildField(
   config: GeneratorConfig,
   depth: number
 ): QueryBuilder {
-  // TODO - fill the args
-  const parameters: ReadonlyArray<Parameter> = []
+  const parameters: ReadonlyArray<Parameter> = generateArgsForField(
+    field,
+    typesByName,
+    config
+  )
 
   const type = unwrapFieldType(field, typesByName)
   const isLeafField = isLeaf(type)

@@ -83,7 +83,10 @@ export function typeToString(type: TypeRef): string {
   }
 
   switch (type.kind) {
-    case (Kind.OBJECT, Kind.INTERFACE, Kind.SCALAR, Kind.ENUM):
+    case Kind.OBJECT:
+    case Kind.INTERFACE:
+    case Kind.SCALAR:
+    case Kind.ENUM:
       if (!type.name) {
         throw createIntrospectionError(`
             Type of kind '${type.kind}' has invalid name '${type.name}' 
@@ -96,7 +99,9 @@ export function typeToString(type: TypeRef): string {
     case Kind.LIST:
       return `[${typeToString(unwrapOneNotNull(type))}]`
     default:
-      throw new Error('this should be unreachable')
+      throw new Error(
+        `this should be unreachable but was reached with type ${type.kind}`
+      )
   }
 }
 
@@ -122,7 +127,7 @@ function specifiedBySource(source?: string): string {
   return source ? ` specified by '${source}'` : ''
 }
 
-function createIntrospectionError(
+export function createIntrospectionError(
   message: string
 ): GraphQLIntrospectionResultError {
   return new GraphQLIntrospectionResultError(
