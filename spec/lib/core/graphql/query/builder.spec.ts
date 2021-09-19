@@ -19,18 +19,32 @@ describe('building a query', () => {
       expect(underTest.withField('name', [])).not.toBe(underTest)
     })
 
+    describe('naming the query', () => {
+      const result = underTest.withField('field', []).withName('Test').build()
+
+      it('should add the name to the query', () => {
+        assertGraphQLQueryEqual(
+          result.query,
+          gql`
+            query Test {
+              field
+            }
+          `
+        )
+      })
+    })
+
     describe('field has no arguments and no sub-selection', () => {
       const result = underTest.withField('field', []).build()
 
       it('should generate the right request', () => {
-        expect(prettify(result.query)).toEqual(
-          prettify(
-            gql`
-              query {
-                field
-              }
-            `
-          )
+        assertGraphQLQueryEqual(
+          result.query,
+          gql`
+            query {
+              field
+            }
+          `
         )
       })
 
@@ -59,14 +73,13 @@ describe('building a query', () => {
         .build()
 
       it('should generate the right request', () => {
-        expect(prettify(result.query)).toEqual(
-          prettify(
-            gql`
-              query ($vegetable: VegetableInput, $name: String!) {
-                field(vegetable: $vegetable, name: $name)
-              }
-            `
-          )
+        assertGraphQLQueryEqual(
+          result.query,
+          gql`
+            query ($vegetable: VegetableInput, $name: String!) {
+              field(vegetable: $vegetable, name: $name)
+            }
+          `
         )
       })
 
@@ -122,8 +135,9 @@ describe('building a query', () => {
         .build()
 
       it('should generate the right request', () => {
-        expect(prettify(result.query)).toEqual(
-          prettify(gql`
+        assertGraphQLQueryEqual(
+          result.query,
+          gql`
             query (
               $vegetable: VegetableInput
               $name: String!
@@ -137,7 +151,7 @@ describe('building a query', () => {
                 }
               }
             }
-          `)
+          `
         )
       })
 
@@ -196,9 +210,9 @@ describe('building a query', () => {
         .build()
 
       it('should generate a request that handle the duplicate variable names', () => {
-        console.log(result.query)
-        expect(prettify(result.query)).toEqual(
-          prettify(gql`
+        assertGraphQLQueryEqual(
+          result.query,
+          gql`
             query ($arg: String!, $arg2: Int!, $arg3: Boolean!) {
               first(arg: $arg)
               second(arg: $arg2)
@@ -208,7 +222,7 @@ describe('building a query', () => {
                 }
               }
             }
-          `)
+          `
         )
       })
     })
@@ -231,14 +245,15 @@ describe('building a mutation', () => {
     .build()
 
   it('should generate a mutation query', () => {
-    expect(prettify(result.query)).toEqual(
-      prettify(gql`
+    assertGraphQLQueryEqual(
+      result.query,
+      gql`
         mutation ($name: String!) {
           vegetables {
             update(name: $name)
           }
         }
-      `)
+      `
     )
   })
 
@@ -248,3 +263,7 @@ describe('building a mutation', () => {
     })
   })
 })
+
+function assertGraphQLQueryEqual(actual: string, expected: string) {
+  expect(prettify(actual)).toEqual(prettify(expected))
+}
