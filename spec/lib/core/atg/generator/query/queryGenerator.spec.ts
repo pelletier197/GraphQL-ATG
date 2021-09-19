@@ -4,11 +4,10 @@ import { generateGraphQLQueries } from '@lib/core/atg/generator/query/queryGener
 import gql, { minify, prettify } from '@lib/core/graphql/gql'
 import { GraphQLQuery } from '@lib/core/graphql/query/query'
 import { INTROSPECTION_SCHEMA } from '@test/__utils__/farm/server'
-import { assert } from 'console'
 
 const DEFAULT_CONFIG: GeneratorConfig = {
   factories: {},
-  maxDepth: 10,
+  maxDepth: 8,
 }
 
 describe('generating graphql queries', () => {
@@ -89,6 +88,109 @@ describe('generating graphql queries', () => {
     )
 
     expect(generatedQueries).toHaveLength(1)
+    expect(prettify(minify(generatedQueries[0].query))).toEqual(
+      prettify(
+        minify(gql`
+          query ($names: String) {
+            farm {
+              animals {
+                all(names: $names) {
+                  name
+                  sound
+                  baby {
+                    name
+                    sound
+                    baby {
+                      name
+                      sound
+                      baby {
+                        name
+                        sound
+                      }
+                    }
+                  }
+                }
+
+                herbivore {
+                  name
+                  sound
+                  baby {
+                    name
+                    sound
+                    baby {
+                      name
+                      sound
+                      baby {
+                        name
+                        sound
+                      }
+                    }
+                  }
+                }
+
+                carnivore {
+                  name
+                  sound
+                  baby {
+                    name
+                    sound
+                    baby {
+                      name
+                      sound
+                      baby {
+                        name
+                        sound
+                      }
+                    }
+                  }
+                }
+
+                eatable {
+                  name
+                  sound
+                  baby {
+                    name
+                    sound
+                    baby {
+                      name
+                      sound
+                      baby {
+                        name
+                        sound
+                      }
+                    }
+                  }
+                }
+              }
+
+              vegetables {
+                name
+                isBestVegetableOnEarth
+                cookingModes
+              }
+
+              employees {
+                fullTime {
+                  name
+                  salary
+                }
+
+                interns {
+                  name
+                  salary
+                }
+
+                unpaidInterns {
+                  name
+                  salary
+                }
+              }
+            }
+          }
+        `)
+      )
+    )
+    expect(Object.keys(generatedQueries[0].variables)).toHaveLength(1)
   })
 })
 
