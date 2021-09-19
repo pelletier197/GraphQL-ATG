@@ -2,23 +2,20 @@ import {
   Parameter,
   QueryBuilder,
   queryBuilder,
-  QueryType,
   subSelectionBuilder,
 } from '@lib/core/graphql/query/builder'
 import { isLeafType } from 'graphql'
 import _ from 'lodash'
-import { off } from 'process'
 
 import { GraphQLQuery } from '../../../graphql/query/query'
 import {
   Field,
   FullType,
   GraphQLIntrospectionResult,
-  TypeRef,
 } from '../../introspection/types'
 import { GeneratorConfig } from '../config'
-import { getRequiredType, isLeaf, unwrapFieldType } from './extractor'
 
+import { getRequiredType, isLeaf, unwrapFieldType } from './extractor'
 import { TypesByName } from './types'
 
 export function generateGraphQLQueries(
