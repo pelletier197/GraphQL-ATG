@@ -15,12 +15,8 @@ export type Parameter = {
   readonly value: unknown
 }
 
-type IdentifiedParameter = Parameter & {
-  readonly id: string
-}
-
 type BuilderField = {
-  readonly parameters: ReadonlyArray<IdentifiedParameter>
+  readonly parameters: ReadonlyArray<Parameter>
   readonly subSelection?: QueryBuilder
 }
 
@@ -55,9 +51,7 @@ export class QueryBuilder {
     return new QueryBuilder(this.type, {
       ...this.fields,
       [name]: {
-        parameters: parameters.map((parameter) =>
-          this.asUniquelyIdentifiedParameter(parameter)
-        ),
+        parameters: parameters,
         subSelection,
       },
     })
@@ -86,7 +80,7 @@ export class QueryBuilder {
     }
 
     type BuiltSubSelection = {
-      readonly parameters: ReadonlyArray<IdentifiedParameter>
+      readonly parameters: ReadonlyArray<Parameter>
       readonly subSelection?: QuerySubSelection
     }
 
@@ -103,12 +97,8 @@ export class QueryBuilder {
     ).map((name: string) => {
       const value = mappedFields[name]
 
-      // TODO parameter variable name should not be the same as the variable. We might try to use the same parameter for two things
       const parametersString = value.parameters
-        .map(
-          (parameter: IdentifiedParameter) =>
-            `${parameter.name}: $${parameter.name}`
-        )
+        .map((parameter: Parameter) => `${parameter.name}: $${parameter.name}`)
         .join(', ')
 
       const parameterPlaceholder =
@@ -147,18 +137,46 @@ export class QueryBuilder {
     return variablesString.length === 0 ? '' : `(${variablesString})`
   }
 
-  private asUniquelyIdentifiedParameter(
-    parameter: Parameter
-  ): IdentifiedParameter {
-    const characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  // private asUniquelyNamedParameters(
+  //   parameters: ReadonlyArray<Parameter>,
+  //   subSelection?: QueryBuilder
+  // ): ReadonlyArray<Parameter> {
+  //   const allVariableNames = new Set(
+  //     this.findAllVariableNamesRecursively(subSelection)
+  //   )
+  //   return parameters.map((parameter) => {
+  //     return this.asUniquelyNamedParameter(parameter, allVariableNames)
+  //   })
+  // }
 
-    const id = _.sampleSize(characters, 10).join()
-    return {
-      id,
-      ...parameter,
-    }
-  }
+  // private findAllVariableNamesRecursively(
+  //   subSelection?: QueryBuilder
+  // ): ReadonlyArray<string> {
+  //   return [
+  //     ..._.flatMap(Object.values(this.fields), (field: BuilderField) => [
+  //       ...field.parameters.map((parameter) => parameter.variableName),
+  //       ...(field.subSelection?.findAllVariableNamesRecursively() || []),
+  //     ]),
+  //     ...(subSelection?.findAllVariableNamesRecursively() || []),
+  //   ]
+  // }
+
+  // private asUniquelyNamedParameter(
+  //   parameter: Parameter,
+  //   allVariableNames: ReadonlySet<string>,
+  //   count = 1
+  // ): VariableParameter {
+  //   const current = count === 1 ? parameter.name : parameter.name + count
+
+  //   if (!allVariableNames.has(current)) {
+  //     return {
+  //       variableName: current,
+  //       ...parameter,
+  //     }
+  //   }
+
+  //   return this.asUniquelyNamedParameter(parameter, allVariableNames, count + 1)
+  // }
 
   private hasFields(): boolean {
     return _.size(this.fields) !== 0

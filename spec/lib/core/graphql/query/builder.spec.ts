@@ -178,6 +178,21 @@ describe('building a query', () => {
             value: 2,
           },
         ])
+        .withField(
+          'thirdNested',
+          [],
+          subSelectionBuilder().withField(
+            'firstLevel',
+            [],
+            subSelectionBuilder().withField('thirdField', [
+              {
+                name: 'arg',
+                type: 'Boolean!',
+                value: true,
+              },
+            ])
+          )
+        )
         .build()
 
       it('should generate a request that handle the duplicate variable names', () => {
@@ -185,9 +200,14 @@ describe('building a query', () => {
         expect(prettify(result.query)).toEqual(
           prettify(gql`
                {
-                   query ($arg: String!, $arg2: Int!) {
+                   query ($arg: String!, $arg2: Int!, $arg3: Boolean!) {
                        first(arg: $arg)
                        second(arg: $arg2)
+                       thirdNested {
+                         firstLevel {
+                           thirdField(arg: $arg3)
+                         }
+                       }
                    }
                  }
            `)
