@@ -19,8 +19,23 @@ export type GeneratorConfig = {
 }
 
 export type GraphQLFactoryContext = {
+  /**
+   * Either the argument name or the nested field name
+   */
   readonly targetName: string
+
+  /**
+   * The context for the default value that would be used otherwise.
+   *
+   * This property is only available when overriding the default generators.
+   */
+  readonly default?: GraphQLFactoryContextDefault
 }
+
+export type GraphQLFactoryContextDefault = {
+  readonly provide: () => unknown
+}
+
 /**
  * A factory providing a random or arbitrary value for a given target argument or argument field.
  */

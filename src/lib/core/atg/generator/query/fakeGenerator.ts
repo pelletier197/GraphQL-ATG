@@ -10,6 +10,7 @@ import {
 } from '../../introspection/types'
 import { GeneratorConfig, GraphQLFactory } from '../config'
 import { GraphQLGenerationError } from '../error'
+import { DEFAULT_FACTORIES } from './defaultFactories'
 
 import {
   createIntrospectionError,
@@ -52,17 +53,30 @@ function generateRandomFromType(
   typesByName: TypesByName,
   config: GeneratorConfig
 ): unknown {
+  const context = {
+    targetName,
+  }
+
+  const defaultFactory = argumentType.name
+    ? DEFAULT_FACTORIES[argumentType.name]
+    : undefined
+
   return findMostSpecificFactory(
     argumentType,
-    targetName,
     typesByName,
     config
-  )()
+  )({
+    ...context,
+    default: defaultFactory
+      ? {
+          provide: () => defaultFactory(context),
+        }
+      : undefined,
+  })
 }
 
 function findMostSpecificFactory(
   argumentType: TypeRef,
-  targetName: string,
   typesByName: TypesByName,
   config: GeneratorConfig
 ): GraphQLFactory {
@@ -83,7 +97,7 @@ function findMostSpecificFactory(
     randomFactory(unwrappedArgumentType, typesByName, config)
 
   if (isArgumentAList) {
-    return () => [factory()]
+    return (context) => [factory(context)]
   }
 
   return factory
