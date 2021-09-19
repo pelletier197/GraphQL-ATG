@@ -195,17 +195,29 @@ describe('building a query', () => {
         .withField(
           'thirdNested',
           [],
-          subSelectionBuilder().withField(
-            'firstLevel',
-            [],
-            subSelectionBuilder().withField('thirdField', [
-              {
-                name: 'arg',
-                type: 'Boolean!',
-                value: true,
-              },
-            ])
-          )
+          subSelectionBuilder()
+            .withField(
+              'firstLevel',
+              [],
+              subSelectionBuilder().withField('thirdField', [
+                {
+                  name: 'arg',
+                  type: 'Boolean!',
+                  value: true,
+                },
+              ])
+            )
+            .withField(
+              'secondFirstLevel',
+              [],
+              subSelectionBuilder().withField('thirdField', [
+                {
+                  name: 'arg',
+                  type: 'Boolean!',
+                  value: true,
+                },
+              ])
+            )
         )
         .build()
 
@@ -213,12 +225,21 @@ describe('building a query', () => {
         assertGraphQLQueryEqual(
           result.query,
           gql`
-            query ($arg: String!, $arg2: Int!, $arg3: Boolean!) {
+            query (
+              $arg: String!
+              $arg2: Int!
+              $arg3: Boolean!
+              $arg4: Boolean!
+            ) {
               first(arg: $arg)
               second(arg: $arg2)
               thirdNested {
                 firstLevel {
                   thirdField(arg: $arg3)
+                }
+
+                secondFirstLevel {
+                  thirdField(arg: $arg4)
                 }
               }
             }
