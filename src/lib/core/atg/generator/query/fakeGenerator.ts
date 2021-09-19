@@ -119,14 +119,19 @@ function randomFactory(
   }
 
   if (argumentType.kind === Kind.SCALAR) {
-    throw new GraphQLGenerationError(`
-      Cannot generate a random value for scalar '${argumentType.name}'. 
-      The random generator is not able to randomly generate a value for non-standard GraphQL scalars. 
-      You have to provide a custom factory by providing this in your config:
-      {
-        '${argumentType.name}': () => generateRandomCustomScalar()
-      }
+    const defaultFactory = DEFAULT_FACTORIES[argumentType.name]
+    if (defaultFactory === undefined) {
+      throw new GraphQLGenerationError(`
+        Cannot generate a random value for scalar '${argumentType.name}'. 
+        The random generator is not able to randomly generate a value for non-standard GraphQL scalars. 
+        You have to provide a custom factory by providing this in your config:
+        {
+          '${argumentType.name}': () => generateRandomCustomScalar()
+        }
     `)
+    }
+
+    return defaultFactory
   }
 
   if (argumentType.kind === Kind.OBJECT) {
