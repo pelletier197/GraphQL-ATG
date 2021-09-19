@@ -19,10 +19,10 @@ export type FullType = {
   readonly name: string
   readonly description?: string
   readonly fields?: ReadonlyArray<Field>
-  readonly inputFields: ReadonlyArray<InputValue>
-  readonly interfaces: ReadonlyArray<TypeRef>
-  readonly enumValues: ReadonlyArray<Enum>
-  readonly possibleTypes: ReadonlyArray<TypeRef>
+  readonly inputFields?: ReadonlyArray<InputValue>
+  readonly interfaces?: ReadonlyArray<TypeRef>
+  readonly enumValues?: ReadonlyArray<Enum>
+  readonly possibleTypes?: ReadonlyArray<TypeRef>
 }
 
 export type Field = {

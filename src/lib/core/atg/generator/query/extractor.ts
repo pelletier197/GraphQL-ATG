@@ -1,4 +1,10 @@
-import { Field, FullType, Kind, TypeRef } from '../../introspection/types'
+import {
+  Field,
+  FullType,
+  InputValue,
+  Kind,
+  TypeRef,
+} from '../../introspection/types'
 import { GraphQLIntrospectionResultError } from '../error'
 
 import { TypesByName } from './types'
@@ -8,6 +14,13 @@ export function unwrapFieldType(
   typesByName: TypesByName
 ): FullType {
   return unwrapType(field.type, typesByName, field.name)
+}
+
+export function unwrapInputValueType(
+  input: InputValue,
+  typesByName: TypesByName
+): FullType {
+  return unwrapType(input.type, typesByName, input.name)
 }
 
 export function unwrapType(
@@ -44,6 +57,47 @@ export function unwrapType(
   }
 
   return unwrapType(type.ofType, typesByName, source)
+}
+
+export function isList(type: TypeRef): boolean {
+  if (type.kind == Kind.LIST) {
+    return true
+  }
+
+  if (!type.ofType) {
+    return false
+  }
+
+  return isList(type.ofType)
+}
+
+export function typeToString(type: TypeRef): string {
+  function unwrapOneNotNull(type: TypeRef): TypeRef {
+    if (!type.ofType) {
+      throw createIntrospectionError(`
+        Unexpected leaf element '${type.kind}'
+      `)
+    }
+
+    return type.ofType
+  }
+
+  switch (type.kind) {
+    case (Kind.OBJECT, Kind.INTERFACE, Kind.SCALAR, Kind.ENUM):
+      if (!type.name) {
+        throw createIntrospectionError(`
+            Type of kind '${type.kind}' has invalid name '${type.name}' 
+          `)
+      }
+
+      return type.name
+    case Kind.NON_NULL:
+      return `${typeToString(unwrapOneNotNull(type))}!`
+    case Kind.LIST:
+      return `[${typeToString(unwrapOneNotNull(type))}]`
+    default:
+      throw new Error('this should be unreachable')
+  }
 }
 
 export function getRequiredType(
