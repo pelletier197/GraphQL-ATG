@@ -199,18 +199,16 @@ describe('building a query', () => {
         console.log(result.query)
         expect(prettify(result.query)).toEqual(
           prettify(gql`
-               {
-                   query ($arg: String!, $arg2: Int!, $arg3: Boolean!) {
-                       first(arg: $arg)
-                       second(arg: $arg2)
-                       thirdNested {
-                         firstLevel {
-                           thirdField(arg: $arg3)
-                         }
-                       }
-                   }
-                 }
-           `)
+            query ($arg: String!, $arg2: Int!, $arg3: Boolean!) {
+              first(arg: $arg)
+              second(arg: $arg2)
+              thirdNested {
+                firstLevel {
+                  thirdField(arg: $arg3)
+                }
+              }
+            }
+          `)
         )
       })
     })

@@ -1,3 +1,4 @@
+/* eslint-disable functional/prefer-readonly-type */
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/no-class */
 import _ from 'lodash'
@@ -15,6 +16,10 @@ export type Parameter = {
   readonly value: unknown
 }
 
+type VariableParameter = Parameter & {
+  variableName: string
+}
+
 type BuilderField = {
   readonly parameters: ReadonlyArray<Parameter>
   readonly subSelection?: QueryBuilder
@@ -24,7 +29,7 @@ type BuilderFields = Record<string, BuilderField>
 
 type QuerySubSelection = {
   readonly query: string
-  readonly variables: ReadonlyArray<Parameter>
+  readonly variables: ReadonlyArray<VariableParameter>
 }
 
 export class QueryBuilder {
@@ -58,7 +63,7 @@ export class QueryBuilder {
   }
 
   build(): GraphQLQuery {
-    const subSelection = this.buildSelection()
+    const subSelection = this.buildSelection(new Set())
     const variablePlaceholder = this.generateArgumentPlaceholder(
       subSelection.variables
     )
@@ -72,7 +77,7 @@ export class QueryBuilder {
     }
   }
 
-  private buildSelection(): QuerySubSelection {
+  private buildSelection(usedParameterNames: Set<string>): QuerySubSelection {
     if (!this.hasFields()) {
       throw new Error(
         'Cannot generate a sub-selection with no fields in it. A minimum of one field must be queried if the sub-selection is defined.'
@@ -80,15 +85,17 @@ export class QueryBuilder {
     }
 
     type BuiltSubSelection = {
-      readonly parameters: ReadonlyArray<Parameter>
+      readonly parameters: ReadonlyArray<VariableParameter>
       readonly subSelection?: QuerySubSelection
     }
 
     const mappedFields: Record<string, BuiltSubSelection> = _.mapValues(
       this.fields,
       (field: BuilderField) => ({
-        parameters: field.parameters,
-        subSelection: field.subSelection?.buildSelection(),
+        parameters: field.parameters.map((parameter) => {
+          return this.asUniquelyNamedParameter(parameter, usedParameterNames)
+        }),
+        subSelection: field.subSelection?.buildSelection(usedParameterNames),
       })
     )
 
@@ -98,24 +105,29 @@ export class QueryBuilder {
       const value = mappedFields[name]
 
       const parametersString = value.parameters
-        .map((parameter: Parameter) => `${parameter.name}: $${parameter.name}`)
+        .map(
+          (parameter: VariableParameter) =>
+            `${parameter.name}: $${parameter.variableName}`
+        )
         .join(', ')
 
       const parameterPlaceholder =
         parametersString.length === 0 ? '' : `(${parametersString})`
 
+      // format: field(arg: $arg, <parameterPlaceholder>) { <subSelection> }
       return `${name}${parameterPlaceholder}${value.subSelection?.query ?? ''}`
     })
 
-    const allQueryVariablesRequiredNested: ReadonlyArray<Parameter> = _.flatMap(
-      Object.keys(mappedFields).map((name: string) => {
-        const mappedField = mappedFields[name]
-        return [
-          ...mappedField.parameters, // Current field parameters
-          ...(mappedField.subSelection?.variables || []), // Parameters of sub selection
-        ]
-      })
-    )
+    const allQueryVariablesRequiredNested: ReadonlyArray<VariableParameter> =
+      _.flatMap(
+        Object.keys(mappedFields).map((name: string) => {
+          const mappedField = mappedFields[name]
+          return [
+            ...mappedField.parameters, // Current field parameters
+            ...(mappedField.subSelection?.variables || []), // Parameters of sub selection
+          ]
+        })
+      )
 
     return {
       query: `
@@ -128,55 +140,36 @@ export class QueryBuilder {
   }
 
   private generateArgumentPlaceholder(
-    variables: ReadonlyArray<Parameter>
+    variables: ReadonlyArray<VariableParameter>
   ): string {
     const variablesString = variables
-      .map((variable) => `$${variable.name}:${variable.type}`)
+      .map((variable) => `$${variable.variableName}:${variable.type}`)
       .join(', ')
 
     return variablesString.length === 0 ? '' : `(${variablesString})`
   }
 
-  // private asUniquelyNamedParameters(
-  //   parameters: ReadonlyArray<Parameter>,
-  //   subSelection?: QueryBuilder
-  // ): ReadonlyArray<Parameter> {
-  //   const allVariableNames = new Set(
-  //     this.findAllVariableNamesRecursively(subSelection)
-  //   )
-  //   return parameters.map((parameter) => {
-  //     return this.asUniquelyNamedParameter(parameter, allVariableNames)
-  //   })
-  // }
+  private asUniquelyNamedParameter(
+    parameter: Parameter,
+    allUsedVariableNames: Set<string>,
+    count = 1
+  ): VariableParameter {
+    const current = count === 1 ? parameter.name : parameter.name + count
 
-  // private findAllVariableNamesRecursively(
-  //   subSelection?: QueryBuilder
-  // ): ReadonlyArray<string> {
-  //   return [
-  //     ..._.flatMap(Object.values(this.fields), (field: BuilderField) => [
-  //       ...field.parameters.map((parameter) => parameter.variableName),
-  //       ...(field.subSelection?.findAllVariableNamesRecursively() || []),
-  //     ]),
-  //     ...(subSelection?.findAllVariableNamesRecursively() || []),
-  //   ]
-  // }
+    if (!allUsedVariableNames.has(current)) {
+      allUsedVariableNames.add(current)
+      return {
+        variableName: current,
+        ...parameter,
+      }
+    }
 
-  // private asUniquelyNamedParameter(
-  //   parameter: Parameter,
-  //   allVariableNames: ReadonlySet<string>,
-  //   count = 1
-  // ): VariableParameter {
-  //   const current = count === 1 ? parameter.name : parameter.name + count
-
-  //   if (!allVariableNames.has(current)) {
-  //     return {
-  //       variableName: current,
-  //       ...parameter,
-  //     }
-  //   }
-
-  //   return this.asUniquelyNamedParameter(parameter, allVariableNames, count + 1)
-  // }
+    return this.asUniquelyNamedParameter(
+      parameter,
+      allUsedVariableNames,
+      count + 1
+    )
+  }
 
   private hasFields(): boolean {
     return _.size(this.fields) !== 0
