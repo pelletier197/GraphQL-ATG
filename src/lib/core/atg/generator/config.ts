@@ -10,10 +10,14 @@ export type GeneratorConfig = {
    *
    * The supported syntax in order of priority for the factory key is the following:
    *  - '[Type]' : In highest priority is the list matcher. If you need to provide a custom list for a specific type.
-   *               If you don't need anything specific in the list, you can use the second matcher.
+   *               If you don't need anything specific in the list, you can u#se the second matcher.
    *
    *  - 'Type' : Your type directly. If there is a direct match for this key, it will be used first.
    *             This factory will also be used when generating a list if no list factory is provided.
+   *
+   * - '*Type':  You type with wildcard. It is more useful if you have many types that you would want empty by default.
+   *             For instance, some applications may have different filters that you would want empty by default, which would give:
+   *             '*Filter' : () => null. The supported syntax is the one of `Micromatch` https://www.npmjs.com/package/micromatch
    */
   readonly factories: Record<string, GraphQLFactory>
 }

@@ -1,5 +1,6 @@
 import { Parameter } from '@lib/core/graphql/query/builder'
 import _ from 'lodash'
+import micromatch from 'micromatch'
 
 import {
   Field,
@@ -10,8 +11,8 @@ import {
 } from '../../introspection/types'
 import { GeneratorConfig, GraphQLFactory } from '../config'
 import { GraphQLGenerationError } from '../error'
-import { DEFAULT_FACTORIES } from './defaultFactories'
 
+import { DEFAULT_FACTORIES } from './defaultFactories'
 import {
   createIntrospectionError,
   isList,
@@ -91,9 +92,10 @@ function findMostSpecificFactory(
     }
   }
 
-  // Get the factory for this type or the random one
+  // Get the specific factory for this type or one by wildcard or a random one
   const factory =
     config.factories[unwrappedArgumentType.name] ??
+    findWildCardFactory(unwrappedArgumentType.name, config) ??
     randomFactory(unwrappedArgumentType, typesByName, config)
 
   if (isArgumentAList) {
@@ -154,4 +156,18 @@ function randomFactory(
   }
 
   throw new Error('this should be unreachable')
+}
+function findWildCardFactory(
+  name: string,
+  config: GeneratorConfig
+): GraphQLFactory | undefined {
+  const matchingKey = Object.keys(config.factories).find((key) =>
+    micromatch.isMatch(name, key)
+  )
+
+  if (matchingKey) {
+    return config.factories[matchingKey]
+  }
+
+  return undefined
 }
