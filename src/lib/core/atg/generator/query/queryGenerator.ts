@@ -18,10 +18,20 @@ import { getRequiredType, isLeaf, unwrapFieldType } from './extractor'
 import { generateArgsForField } from './fakeGenerator'
 import { TypesByName } from './types'
 
+const DEFAULT_CONFIG: GeneratorConfig = {
+  maxDepth: 5,
+  factories: {},
+}
+
 export function generateGraphQLQueries(
   introspectionResult: GraphQLIntrospectionResult,
-  config: GeneratorConfig
+  config?: Partial<GeneratorConfig>
 ): ReadonlyArray<GraphQLQuery> {
+  const mergedConfig = {
+    ...DEFAULT_CONFIG,
+    config,
+  }
+
   const schema = introspectionResult.__schema
 
   // There is no query type, so no queries can be generated
@@ -36,7 +46,7 @@ export function generateGraphQLQueries(
 
   return rootQueryType.fields
     .map((field) => {
-      return buildField(initialBuilder, field, typesByName, config, 1)
+      return buildField(initialBuilder, field, typesByName, mergedConfig, 1)
     })
     .filter((x) => x !== initialBuilder)
     .map((x) => x.build())
