@@ -1,7 +1,8 @@
 import { GraphQLClient } from '@lib/core/graphql/client'
 import { GraphQLQueryError } from '@lib/core/graphql/error'
 
-import { INTROSPECTION_QUERY, IntrospectionQueryConfig } from './query'
+import { IntrospectionQueryConfig } from './config'
+import { INTROSPECTION_QUERY } from './query'
 import { GraphQLIntrospectionResult } from './types'
 
 const DEFAULT_INTROSPECTION_CONFIG: IntrospectionQueryConfig = {
@@ -14,10 +15,7 @@ export async function introspect(
 ): Promise<GraphQLIntrospectionResult> {
   const result = await client.request<GraphQLIntrospectionResult>(
     INTROSPECTION_QUERY,
-    {
-      ...DEFAULT_INTROSPECTION_CONFIG,
-      ...config,
-    }
+    Object.assign({}, DEFAULT_INTROSPECTION_CONFIG, config)
   )
 
   if (!result.data || result.errors?.length > 0) {

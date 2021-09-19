@@ -101,7 +101,3 @@ export const INTROSPECTION_QUERY = gql`
     }
   }
 `
-
-export type IntrospectionQueryConfig = {
-  readonly includeDeprecated: boolean
-}

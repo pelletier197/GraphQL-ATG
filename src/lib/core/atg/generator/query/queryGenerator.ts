@@ -27,10 +27,7 @@ export function generateGraphQLQueries(
   introspectionResult: GraphQLIntrospectionResult,
   config?: Partial<GeneratorConfig>
 ): ReadonlyArray<GraphQLQuery> {
-  const mergedConfig = {
-    ...DEFAULT_CONFIG,
-    config,
-  }
+  const mergedConfig = Object.assign({}, DEFAULT_CONFIG, config)
 
   const schema = introspectionResult.__schema
 
@@ -89,7 +86,7 @@ function generateField(
 }
 
 function buildField(
-  memo: QueryBuilder,
+  builder: QueryBuilder,
   field: Field,
   typesByName: TypesByName,
   config: GeneratorConfig,
@@ -106,7 +103,7 @@ function buildField(
 
   if (isLeafField) {
     // No sub selection is allowed since this is a leaf
-    return memo.withField(field.name, parameters)
+    return builder.withField(field.name, parameters)
   }
 
   const generatedSubSelection = generateField(
@@ -118,9 +115,9 @@ function buildField(
 
   if (generatedSubSelection === null) {
     // No new field in the builder, as we can't select any sub field due to max depth
-    return memo
+    return builder
   }
 
   // Modify the builder to select the sub field
-  return memo.withField(field.name, parameters, generatedSubSelection)
+  return builder.withField(field.name, parameters, generatedSubSelection)
 }
