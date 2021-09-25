@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="300"  src="./logo/logo.png">
+  <img src="./logo/logo.png">
 </p>
 
 # graphql-atg
