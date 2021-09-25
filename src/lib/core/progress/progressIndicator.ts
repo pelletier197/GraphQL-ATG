@@ -2,10 +2,10 @@ import ora from 'ora'
 
 const spinner = ora({
   spinner: {
-    frames: ['⬤=◯=◯', '◯=⬤=◯', '◯=◯=⬤', '◯=⬤=◯'],
-    interval: 100,
+    frames: ['●—○—◯', '◯—●—◯', '◯—◯—●', '◯—●—◯'],
+    interval: 250,
   },
-  color: 'white',
+  color: 'green',
 })
 
 export function start(text: string) {

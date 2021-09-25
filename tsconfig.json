@@ -6,6 +6,7 @@
     "rootDir": "src",
     "moduleResolution": "node",
     "module": "es2020",
+    "noEmit": true,
     "esModuleInterop": true,
     "strict": true,
     "noImplicitAny": true,

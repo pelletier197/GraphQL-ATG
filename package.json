@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "build": "run-p build:*",
-    "build:main": "tsc -p tsconfig-build.json && tscpaths -p tsconfig-build.json -s src -o build && yab ./build",
+    "build:main": "tsc -p tsconfig-build.json && tscpaths -p tsconfig-build.json -s src -o build",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" \"spec/**/*.ts\" --write",
     "fix:lint": "eslint src --ext .ts --fix",
