@@ -12,10 +12,10 @@ export function start(text: string) {
   spinner.start(text)
 }
 
-export function success() {
+export function succeed() {
   spinner.succeed()
 }
 
-export function fail() {
+export function failed() {
   spinner.fail()
 }

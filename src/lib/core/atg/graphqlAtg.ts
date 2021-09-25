@@ -1,7 +1,6 @@
 import { createClient } from '@lib/infrastructure/graphql/client'
 
 import { GraphQLAtgConfig } from './config'
-import { GeneratorConfig } from './generator/config'
 import { generateGraphQLQueries } from './generator/query/queryGenerator'
 import { introspect } from './introspection/introspecter'
 
