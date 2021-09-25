@@ -37,10 +37,10 @@
     "baseUrl": ".",
     "paths": {
       "@lib/*": ["src/lib/*"],
-      "@test/*": ["spec/lib/*"]
+      "@test/*": ["core/spec/lib/*"]
     }
   },
-  "include": ["src/**/*.ts", "spec/**/*.spec.ts"],
+  "include": ["src/**/*.ts", "core/spec/**/*.spec.ts"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }
