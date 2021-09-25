@@ -20,7 +20,19 @@
     "sandboxed",
     "transpiled",
     "typedoc",
-    "untracked"
+    "untracked",
+    "fullname",
+    "fullnames",
+    "firstname",
+    "firstnames",
+    "lastname",
+    "lastnames",
+    "jobtitle",
+    "jobtitles",
+    "jobarea",
+    "zipcode",
+    "zipcodes",
+    "introspecter"
   ],
   "flagWords": [],
   "ignorePaths": [
@@ -28,6 +40,7 @@
     "package-lock.json",
     "yarn.lock",
     "tsconfig.json",
-    "node_modules/**"
+    "node_modules/**",
+    "**/server.ts"
   ]
 }

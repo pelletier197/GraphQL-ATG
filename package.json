@@ -19,7 +19,7 @@
     "test": "run-s build test:*",
     "test:lint": "eslint src --ext .ts",
     "test:prettier": "prettier \"src/**/*.ts\" \"spec/**/*.ts\" --list-different",
-    "test:spelling": "cspell \"{README.md,.github/*.md,src/**/*.ts}\"",
+    "test:spelling": "cspell \"{README.md,.github/*.md,src/**/*.ts,spec/**/*.ts}\"",
     "test:unit": "jest",
     "watch:build": "tsc -p tsconfig-build.json -w",
     "watch:test": "jest --watch",

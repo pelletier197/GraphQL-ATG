@@ -116,7 +116,7 @@ const ALL_FULLTIME_EMPLOYEES: ReadonlyArray<Employee> = [
 
 const ALL_INTERNS: ReadonlyArray<Employee> = [
   {
-    name: 'Sundy',
+    name: 'John',
     salary: 20_000,
   },
   {
