@@ -2,14 +2,14 @@
   "name": "graphql-atg",
   "version": "1.0.0",
   "description": "GraphQL Automated Test Generator (ATG) generates automatic tests for you API by fetching the GraphQL introspection schema and by automatically generating requests for that API",
-  "main": "build/index.js",
+  "main": "build/index.mjs",
   "repository": "https://github.com/pelletier197/graphql-atg",
   "license": "MIT",
   "keywords": [],
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "build": "run-p build:*",
-    "build:main": "tsc -p tsconfig-build.json",
+    "build:main": "tsc -p tsconfig-build.json && tscpaths -p tsconfig-build.json -s src -o build && yab ./build",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" \"spec/**/*.ts\" --write",
     "fix:lint": "eslint src --ext .ts --fix",
@@ -26,7 +26,7 @@
     "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
-    "clean": "rm -r build coverage"
+    "clean": "rm -r build coverage || true"
   },
   "engines": {
     "node": ">=10"
@@ -54,6 +54,7 @@
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
     "apollo-server": "^3.3.0",
+    "babel-plugin-add-import-extension": "^1.6.0",
     "codecov": "^3.5.0",
     "cspell": "^4.1.0",
     "cz-conventional-changelog": "^3.3.0",
@@ -72,6 +73,7 @@
     "standard-version": "^9.0.0",
     "ts-jest": "^27.0.5",
     "ts-node": "^9.0.0",
+    "tscpaths": "^0.0.9",
     "typedoc": "^0.19.0",
     "typescript": "^4.0.2"
   },

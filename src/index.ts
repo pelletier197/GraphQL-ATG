@@ -1,6 +1,11 @@
-import { failed, start, succeed } from '@lib/core/progress/progressIndicator'
+import { createGraphQLAtg } from '@lib/core/atg/graphqlAtg.js'
+import { failed, start, succeed } from '@lib/core/progress/progressIndicator.js'
 
-console.log('test')
+const t = createGraphQLAtg({
+  endpoint: 'http://localhost:8088',
+})
+
+console.log(t)
 
 start('step 1')
 succeed()
