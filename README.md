@@ -1,4 +1,6 @@
-<img align="center" width="200" src="./logo/logo.png" />
+<p align="center">
+  <img width="200"  src="./logo/logo.png">
+</p>
 
 # graphql-atg
 
