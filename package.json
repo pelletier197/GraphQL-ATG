@@ -8,7 +8,7 @@
   "keywords": [],
   "type": "module",
   "scripts": {
-    "start" : "run-p build && (cd build; node --experimental-specifier-resolution=node index)",
+    "start": "run-p build && (cd build; node --experimental-specifier-resolution=node index)",
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig-build.json && tscpaths -p tsconfig-build.json -s src -o build",
     "fix": "run-s fix:*",
@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@types/node": "^16.9.1",
+    "commander": "^8.2.0",
     "deasync": "^0.1.23",
     "faker": "^5.5.3",
     "graphql-formatter": "^1.0.3",
