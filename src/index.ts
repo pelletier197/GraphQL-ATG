@@ -1,3 +1,4 @@
+import { GraphQLFactory } from '@lib/core/atg/generator/config'
 import { Headers } from '@lib/infrastructure/graphql/client'
 import { InvalidArgumentError, program } from 'commander'
 import _ from 'lodash'
@@ -12,10 +13,10 @@ function validatedParseInt(value: string): number {
   return parsedValue
 }
 
-function convertToFactoryFileList(
+function convertToFactories(
   value: string,
-  previous: ReadonlyArray<string>
-): ReadonlyArray<string> {
+  previous: Record<string, GraphQLFactory>
+): Record<string, GraphQLFactory> {
   const error = `
     Invalid factories configuration. Ensure your default export is an object with strings as keys and functions as values.
     Example: 
@@ -41,6 +42,11 @@ function convertToFactoryFileList(
         throw new InvalidArgumentError(error)
       }
     })
+
+    return {
+      ...previous,
+      configuration,
+    }
   } catch (error) {
     if (error instanceof InvalidArgumentError) {
       throw error
@@ -90,7 +96,9 @@ program
     validatedParseInt,
     3
   )
-  .getOptionValue(
+  .option(
     '--gff, --generation.factories-file',
-    'A GraphQL input type factory file configuration. This javascript file will be imported and executed to override the default factories provided by the framework.'
+    'A GraphQL input type factory file configuration. This javascript file will be imported and executed to override the default factories provided by the framework.',
+    convertToFactories,
+    {}
   )
