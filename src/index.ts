@@ -16,18 +16,23 @@ function convertToFactoryFileList(
   value: string,
   previous: ReadonlyArray<string>
 ): ReadonlyArray<string> {
+  const error = `
+    Invalid factories configuration. Ensure your default export is an object with strings as keys and functions as values.
+    Example: 
+      export default {
+          'Paging': (context) => ({ first: 10, skip: 0 })
+      }
+  `.trimStart()
+
   try {
-    import configuration from value
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const configuration = require(value)
 
-    _.forOwn(configuration, (key, value) => {
-      const error = `
-          Invalid factories configuration. Ensure your default export is an object with strings as keys and functions as values.
-          Example: 
-            export default {
-                'Paging': (context) => ({ first: 10, skip: 0 })
-            }
-        `.trimStart()
+    if (!(configuration instanceof Object)) {
+      throw new InvalidArgumentError(error)
+    }
 
+    _.forOwn(configuration, (key: unknown, value: unknown) => {
       if (!(key instanceof String)) {
         throw new InvalidArgumentError(error)
       }
