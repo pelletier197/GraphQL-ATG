@@ -34,6 +34,8 @@ export function unwrapType(
       Kind.OBJECT,
       Kind.SCALAR,
       Kind.ENUM,
+      Kind.INPUT_OBJECT,
+      Kind.UNION,
     ]
 
     if (!supportedLeaves.includes(type.kind)) {
@@ -87,6 +89,7 @@ export function typeToString(type: TypeRef): string {
     case Kind.INTERFACE:
     case Kind.SCALAR:
     case Kind.ENUM:
+    case Kind.INPUT_OBJECT:
       if (!type.name) {
         throw createIntrospectionError(`
             Type of kind '${type.kind}' has invalid name '${type.name}' 

@@ -119,10 +119,10 @@ program
     '-gmd, --generation.max-depth <number>',
     'The max depth at which the query generation engine will go to generate queries. Every field over this depth will not be queried, so make sure to put a depth as big as necessary for your entire API can be queried.',
     validatedParseInt,
-    3
+    5
   )
   .option(
-    '--gff, --generation.factories-file <file>',
+    '-gff, --generation.factories-file <file>',
     'A GraphQL input type factory file configuration. This javascript file will be imported and executed to override the default factories provided by the framework.',
     convertToFactoriesFile,
     []

@@ -136,7 +136,7 @@ function randomFactory(
     return defaultFactory
   }
 
-  if (argumentType.kind === Kind.OBJECT) {
+  if (argumentType.kind === Kind.INPUT_OBJECT) {
     const fields = argumentType.fields || []
 
     // Generates a random object the required fields in the object

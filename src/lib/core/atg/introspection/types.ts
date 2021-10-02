@@ -61,6 +61,8 @@ export enum Kind {
   SCALAR = 'SCALAR',
   INTERFACE = 'INTERFACE',
   ENUM = 'ENUM',
+  INPUT_OBJECT = 'INPUT_OBJECT',
+  UNION = 'UNION',
 }
 
 export type Directive = {
