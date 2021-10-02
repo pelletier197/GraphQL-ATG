@@ -8,3 +8,5 @@ coverage
 *.log
 package-lock.json
 tsconfig-build.tsbuildinfo
+
+factory.js

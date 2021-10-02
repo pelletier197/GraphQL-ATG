@@ -23,6 +23,14 @@ export function unwrapInputValueType(
   return unwrapType(input.type, typesByName, input.name)
 }
 
+export function unwrapNonNull(type: TypeRef): TypeRef {
+  if (isNonNull(type) && type.ofType) {
+    return type.ofType
+  }
+
+  return type
+}
+
 export function unwrapType(
   type: TypeRef,
   typesByName: TypesByName,
@@ -71,6 +79,10 @@ export function isList(type: TypeRef): boolean {
   }
 
   return isList(type.ofType)
+}
+
+export function isNonNull(type: TypeRef): boolean {
+  return type.kind == Kind.NON_NULL
 }
 
 export function typeToString(type: TypeRef): string {

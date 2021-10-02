@@ -12,7 +12,7 @@ import {
   FullType,
   GraphQLIntrospectionResult,
 } from '../../introspection/types'
-import { GeneratorConfig } from '../config'
+import { GeneratorConfig, NullGenerationStrategy } from '../config'
 
 import { getRequiredType, isLeaf, unwrapFieldType } from './extractor'
 import { generateArgsForField } from './fakeGenerator'
@@ -20,6 +20,7 @@ import { TypesByName } from './types'
 
 const DEFAULT_CONFIG: GeneratorConfig = {
   maxDepth: 5,
+  nullGenerationStrategy: NullGenerationStrategy.NEVER_NULL,
   factories: {},
 }
 

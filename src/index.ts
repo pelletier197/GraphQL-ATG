@@ -1,4 +1,7 @@
-import { GraphQLFactory } from '@lib/core/atg/generator/config'
+import {
+  GraphQLFactory,
+  NullGenerationStrategy,
+} from '@lib/core/atg/generator/config'
 import { createGraphQLAtg } from '@lib/core/atg/graphqlAtg'
 import { Headers } from '@lib/infrastructure/graphql/client'
 import { InvalidArgumentError, program } from 'commander'
@@ -140,13 +143,14 @@ async function run() {
     },
     generation: {
       maxDepth: options['generation.maxDepth'],
+      nullGenerationStrategy: NullGenerationStrategy.NEVER_NULL,
       factories: await parseFactories(options['generation.factoriesFile']),
     },
     headers: options['headers'],
   })
 
-  const result = await atg.run()
-  console.log(result)
+  await atg.run()
+  // console.log(result)
 }
 
 run()

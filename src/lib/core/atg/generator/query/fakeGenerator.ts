@@ -9,14 +9,20 @@ import {
   Kind,
   TypeRef,
 } from '../../introspection/types'
-import { GeneratorConfig, GraphQLFactory } from '../config'
+import {
+  GeneratorConfig,
+  GraphQLFactory,
+  NullGenerationStrategy,
+} from '../config'
 import { GraphQLGenerationError } from '../error'
 
 import { DEFAULT_FACTORIES } from './defaultFactories'
 import {
   createIntrospectionError,
   isList,
+  isNonNull,
   typeToString,
+  unwrapNonNull,
   unwrapType,
 } from './extractor'
 import { TypesByName } from './types'
@@ -58,12 +64,26 @@ function generateRandomFromType(
     targetName,
   }
 
-  const defaultFactory = argumentType.name
-    ? DEFAULT_FACTORIES[argumentType.name]
+  const nullable = !isNonNull(argumentType)
+  if (nullable) {
+    // And that null generation is either always null, or that we randomly decide to return null
+    if (
+      config.nullGenerationStrategy == NullGenerationStrategy.ALWAYS_NULL ||
+      (config.nullGenerationStrategy == NullGenerationStrategy.SOMETIMES_NULL &&
+        Math.random() > 0.5)
+    ) {
+      return null
+    }
+  }
+
+  const unwrapedArgument = unwrapNonNull(argumentType)
+
+  const defaultFactory = unwrapedArgument.name
+    ? DEFAULT_FACTORIES[unwrapedArgument.name]
     : undefined
 
   return findMostSpecificFactory(
-    argumentType,
+    unwrapedArgument,
     typesByName,
     config
   )({

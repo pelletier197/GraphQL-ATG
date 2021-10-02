@@ -1,3 +1,9 @@
+export enum NullGenerationStrategy {
+  NEVER_NULL = 'NEVER_NULL',
+  ALWAYS_NULL = 'ALWAYS_NULL',
+  SOMETIMES_NULL = 'SOMETIMES_NULL',
+}
+
 export type GeneratorConfig = {
   /**
    * The max depth at which we want to generate the query.
@@ -5,6 +11,17 @@ export type GeneratorConfig = {
    * If the query gets over that depth, all fields that are not leaves are discarded from the query.
    */
   readonly maxDepth: number
+
+  /**
+   * For input values that allow for null values, the strategy here will define the default behaviour for generating the null values.
+   *
+   * Choices are
+   *  - NEVER_NULL, which will never pass nullable values as null
+   *  - ALWAYS_NULL, which will always pass nullable values as null
+   *  - SOMETIMES_NULL, which will randomly pass null or not
+   */
+  readonly nullGenerationStrategy: NullGenerationStrategy
+
   /**
    * Custom factories. Custom factories are used when generating random input values to pass as arguments to your API.
    *
