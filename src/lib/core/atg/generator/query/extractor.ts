@@ -31,6 +31,14 @@ export function unwrapNonNull(type: TypeRef): TypeRef {
   return type
 }
 
+export function unwrapList(type: TypeRef): TypeRef {
+  if (isList(type) && type.ofType) {
+    return type.ofType
+  }
+
+  return type
+}
+
 export function unwrapType(
   type: TypeRef,
   typesByName: TypesByName,
@@ -74,11 +82,7 @@ export function isList(type: TypeRef): boolean {
     return true
   }
 
-  if (!type.ofType) {
-    return false
-  }
-
-  return isList(type.ofType)
+  return false
 }
 
 export function isNonNull(type: TypeRef): boolean {

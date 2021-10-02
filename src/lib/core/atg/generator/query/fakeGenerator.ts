@@ -22,6 +22,7 @@ import {
   isList,
   isNonNull,
   typeToString,
+  unwrapList,
   unwrapNonNull,
   unwrapType,
 } from './extractor'
@@ -64,26 +65,14 @@ function generateRandomFromType(
     targetName,
   }
 
-  const nullable = !isNonNull(argumentType)
-  if (nullable) {
-    // And that null generation is either always null, or that we randomly decide to return null
-    if (
-      config.nullGenerationStrategy == NullGenerationStrategy.ALWAYS_NULL ||
-      (config.nullGenerationStrategy == NullGenerationStrategy.SOMETIMES_NULL &&
-        Math.random() > 0.5)
-    ) {
-      return null
-    }
-  }
+  const unwrappedArgument = unwrapNonNull(argumentType)
 
-  const unwrapedArgument = unwrapNonNull(argumentType)
-
-  const defaultFactory = unwrapedArgument.name
-    ? DEFAULT_FACTORIES[unwrapedArgument.name]
+  const defaultFactory = unwrappedArgument.name
+    ? DEFAULT_FACTORIES[unwrappedArgument.name]
     : undefined
 
   return findMostSpecificFactory(
-    unwrapedArgument,
+    argumentType,
     typesByName,
     config
   )({
@@ -99,30 +88,58 @@ function generateRandomFromType(
 function findMostSpecificFactory(
   argumentType: TypeRef,
   typesByName: TypesByName,
-  config: GeneratorConfig
+  config: GeneratorConfig,
+  nullable = true
 ): GraphQLFactory {
+  // Did the user provide a factory for this exact type?
+  const factoryDirectType = config.factories[typeToString(argumentType)]
+  if (factoryDirectType) {
+    return factoryDirectType
+  }
+
+  // If not null, we must unwrap and go deeper
+  if (isNonNull(argumentType)) {
+    return findMostSpecificFactory(
+      unwrapNonNull(argumentType),
+      typesByName,
+      config,
+      false
+    )
+  }
+
+  // The wrapped type allowed for nullable
+  if (
+    nullable &&
+    (config.nullGenerationStrategy == NullGenerationStrategy.ALWAYS_NULL ||
+      (config.nullGenerationStrategy == NullGenerationStrategy.SOMETIMES_NULL &&
+        Math.random() > 0.5))
+  ) {
+    return () => null
+  }
+
+  // For a list, we find a factory for its elements
+  if (isList(argumentType)) {
+    const listElementFactory = findMostSpecificFactory(
+      unwrapList(argumentType),
+      typesByName,
+      config
+    )
+    return (context) => [listElementFactory(context)]
+  }
+
   const unwrappedArgumentType = unwrapType(argumentType, typesByName)
-  const isArgumentAList = isList(argumentType)
 
-  if (isArgumentAList) {
-    // Is there a factory for this specific list types
-    const factory = config.factories[`[${unwrappedArgumentType.name}]`]
-    if (factory !== undefined) {
-      return factory
-    }
+  // Factory that matches by wildcard
+  const wildCardFactory = findWildCardFactory(
+    unwrappedArgumentType.name,
+    config
+  )
+  if (wildCardFactory) {
+    return wildCardFactory
   }
 
-  // Get the specific factory for this type or one by wildcard or a random one
-  const factory =
-    config.factories[unwrappedArgumentType.name] ??
-    findWildCardFactory(unwrappedArgumentType.name, config) ??
-    randomFactory(unwrappedArgumentType, typesByName, config)
-
-  if (isArgumentAList) {
-    return (context) => [factory(context)]
-  }
-
-  return factory
+  // Factory that matches by wildcard
+  return randomFactory(unwrappedArgumentType, typesByName, config)
 }
 
 function randomFactory(
@@ -157,7 +174,7 @@ function randomFactory(
   }
 
   if (argumentType.kind === Kind.INPUT_OBJECT) {
-    const fields = argumentType.fields || []
+    const fields = argumentType.inputFields || []
 
     // Generates a random object the required fields in the object
     return () => {

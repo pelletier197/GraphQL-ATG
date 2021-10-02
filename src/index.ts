@@ -143,7 +143,7 @@ async function run() {
     },
     generation: {
       maxDepth: options['generation.maxDepth'],
-      nullGenerationStrategy: NullGenerationStrategy.NEVER_NULL,
+      nullGenerationStrategy: NullGenerationStrategy.ALWAYS_NULL,
       factories: await parseFactories(options['generation.factoriesFile']),
     },
     headers: options['headers'],
