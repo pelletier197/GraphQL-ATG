@@ -1,4 +1,5 @@
 import { GraphQLFactory } from '@lib/core/atg/generator/config'
+import { createGraphQLAtg } from '@lib/core/atg/graphqlAtg'
 import { Headers } from '@lib/infrastructure/graphql/client'
 import { InvalidArgumentError, program } from 'commander'
 import _ from 'lodash'
@@ -13,11 +14,36 @@ function validatedParseInt(value: string): number {
   return parsedValue
 }
 
-function convertToFactories(
+function convertToFactoriesFile(
   value: string,
-  previous: Record<string, GraphQLFactory>
-): Record<string, GraphQLFactory> {
-  const error = `
+  previous: ReadonlyArray<string>
+): ReadonlyArray<string> {
+  return [value, ...previous]
+}
+
+async function parseFactories(
+  factories: ReadonlyArray<string>
+): Promise<Record<string, GraphQLFactory>> {
+  return await factories.reduce(
+    async (
+      previous: Promise<Record<string, GraphQLFactory>>,
+      current: string
+    ) => {
+      const previousValue = await previous
+      const result = await parseFactory(current)
+      return {
+        ...previousValue,
+        ...result,
+      }
+    },
+    Promise.resolve({})
+  )
+}
+
+async function parseFactory(
+  value: string
+): Promise<Record<string, GraphQLFactory>> {
+  const genericError = `
     Invalid factories configuration. Ensure your default export is an object with strings as keys and functions as values.
     Example: 
       export default {
@@ -26,27 +52,26 @@ function convertToFactories(
   `.trimStart()
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const configuration = require(value)
+    const configuration = (await import(value)).default
 
     if (!(configuration instanceof Object)) {
-      throw new InvalidArgumentError(error)
+      const specificError = `Expected default export to be of type Object, but was ${configuration} of type ${typeof configuration}`
+      throw new InvalidArgumentError(`${specificError}\n\n${genericError}`)
     }
 
-    _.forOwn(configuration, (key: unknown, value: unknown) => {
-      if (!(key instanceof String)) {
-        throw new InvalidArgumentError(error)
+    _.forOwn(configuration, (value: unknown, key: unknown) => {
+      if (typeof key !== 'string') {
+        const specificError = `Expected default export to contain only keys of type String, but was ${key} of type ${typeof key}`
+        throw new InvalidArgumentError(`${specificError}\n\n${genericError}`)
       }
 
-      if (!(value instanceof Function)) {
-        throw new InvalidArgumentError(error)
+      if (typeof value !== 'function') {
+        const specificError = `Expected default export to contain only values of type Function, but was ${value} of type ${typeof value}`
+        throw new InvalidArgumentError(`${specificError}\n\n${genericError}`)
       }
     })
 
-    return {
-      ...previous,
-      configuration,
-    }
+    return configuration
   } catch (error) {
     if (error instanceof InvalidArgumentError) {
       throw error
@@ -97,8 +122,31 @@ program
     3
   )
   .option(
-    '--gff, --generation.factories-file',
+    '--gff, --generation.factories-file <file>',
     'A GraphQL input type factory file configuration. This javascript file will be imported and executed to override the default factories provided by the framework.',
-    convertToFactories,
-    {}
+    convertToFactoriesFile,
+    []
   )
+
+program.parse(process.argv)
+
+const options = program.opts()
+
+async function run() {
+  const atg = createGraphQLAtg({
+    endpoint: options['endpoint'],
+    introspection: {
+      includeDeprecated: options['introspection.includeDeprecated'],
+    },
+    generation: {
+      maxDepth: options['generation.maxDepth'],
+      factories: await parseFactories(options['generation.factoriesFile']),
+    },
+    headers: options['headers'],
+  })
+
+  const result = await atg.run()
+  console.log(result)
+}
+
+run()
