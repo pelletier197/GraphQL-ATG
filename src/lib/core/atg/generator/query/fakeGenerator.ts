@@ -34,49 +34,44 @@ export function generateArgsForField(
   config: GeneratorConfig
 ): ReadonlyArray<Parameter> {
   return field.args.map((argument) =>
-    generateArgument(argument, typesByName, config)
+    generateInputParameter(argument, typesByName, config)
   )
 }
 
-function generateArgument(
-  argument: InputValue,
+function generateInputParameter(
+  input: InputValue,
   typesByName: TypesByName,
   config: GeneratorConfig
 ): Parameter {
   return {
-    name: argument.name,
-    type: typeToString(argument.type),
-    value: generateRandomFromType(
-      argument.type,
-      argument.name,
-      typesByName,
-      config
-    ),
+    name: input.name,
+    type: typeToString(input.type),
+    value: generateInput(input, typesByName, config),
   }
 }
 
-function generateRandomFromType(
-  argumentType: TypeRef,
-  targetName: string,
+function generateInput(
+  input: InputValue,
   typesByName: TypesByName,
   config: GeneratorConfig
 ): unknown {
   const context = {
-    targetName,
+    targetName: input.name,
   }
 
-  const unwrappedArgument = unwrapNonNull(argumentType)
+  const unwrappedArgument = unwrapNonNull(input.type)
 
   const defaultFactory = unwrappedArgument.name
     ? DEFAULT_FACTORIES[unwrappedArgument.name]
     : undefined
 
   return findMostSpecificFactory(
-    argumentType,
+    input.type,
     typesByName,
     config
   )({
     ...context,
+    defaultValue: input.defaultValue,
     defaultFactory: defaultFactory
       ? {
           provide: () => defaultFactory(context),
@@ -180,13 +175,8 @@ function randomFactory(
     return () => {
       return _.mapValues(
         _.keyBy(fields, (field) => field.name),
-        (field: Field) => {
-          return generateRandomFromType(
-            field.type,
-            field.name,
-            typesByName,
-            config
-          )
+        (input: InputValue) => {
+          return generateInput(input, typesByName, config)
         }
       )
     }
