@@ -4,6 +4,7 @@ import {
   queryBuilder,
   subSelectionBuilder,
 } from '@lib/core/graphql/query/builder'
+import { start, succeed } from '@lib/core/progress/progressIndicator'
 import _ from 'lodash'
 
 import { GraphQLQuery } from '../../../graphql/query/query'
@@ -28,6 +29,7 @@ export function generateGraphQLQueries(
   introspectionResult: GraphQLIntrospectionResult,
   config?: Partial<GeneratorConfig>
 ): ReadonlyArray<GraphQLQuery> {
+  start('Generate queries')
   const mergedConfig = Object.assign({}, DEFAULT_CONFIG, config)
 
   const schema = introspectionResult.__schema
@@ -42,12 +44,16 @@ export function generateGraphQLQueries(
 
   const initialBuilder = queryBuilder()
 
-  return rootQueryType.fields
+  const result = rootQueryType.fields
     .map((field) => {
       return buildField(initialBuilder, field, typesByName, mergedConfig, 1)
     })
     .filter((x) => x !== initialBuilder)
     .map((x) => x.build())
+
+  succeed()
+
+  return result
 }
 
 function generateField(

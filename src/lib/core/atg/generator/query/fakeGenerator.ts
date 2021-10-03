@@ -77,7 +77,7 @@ function generateRandomFromType(
     config
   )({
     ...context,
-    default: defaultFactory
+    defaultFactory: defaultFactory
       ? {
           provide: () => defaultFactory(context),
         }

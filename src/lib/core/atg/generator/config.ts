@@ -46,11 +46,19 @@ export type GraphQLFactoryContext = {
   readonly targetName: string
 
   /**
-   * The context for the default value that would be used otherwise.
+   * The default value provided by the GraphQL schema.
+   * 
+   * By default, ATG will not use the default value provided in the schema, but you can DYI by providing factory that returns the default value.
+   */
+  readonly defaultValue?: unknown
+
+  /**
+   * The context for the default value provider that would be used otherwise.
+   * Can be useful if you want to perform custom actions and fallback to default.
    *
    * This property is only available when overriding the default generators.
    */
-  readonly default?: GraphQLFactoryContextDefault
+  readonly defaultFactory?: GraphQLFactoryContextDefault
 }
 
 export type GraphQLFactoryContextDefault = {
