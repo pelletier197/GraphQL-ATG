@@ -55,15 +55,16 @@ function generateInput(
   typesByName: TypesByName,
   config: GeneratorConfig
 ): unknown {
+  // If you have a field [String!]!, this returns the factory for the string.
+  const unwrappedType = unwrapType(input.type, typesByName)
+  const defaultFactory = unwrappedType.name
+    ? DEFAULT_FACTORIES[unwrappedType.name]
+    : undefined
+
   const context = {
     targetName: input.name,
+    defaultValue: input.defaultValue,
   }
-
-  const unwrappedArgument = unwrapNonNull(input.type)
-
-  const defaultFactory = unwrappedArgument.name
-    ? DEFAULT_FACTORIES[unwrappedArgument.name]
-    : undefined
 
   return findMostSpecificFactory(
     input.type,
@@ -71,12 +72,16 @@ function generateInput(
     config
   )({
     ...context,
-    defaultValue: input.defaultValue,
     defaultFactory: defaultFactory
       ? {
           provide: () => defaultFactory(context),
         }
       : undefined,
+    randomFactory: {
+      provide: () => {
+        return randomFactory(unwrappedType, typesByName, config)(context)
+      },
+    },
   })
 }
 

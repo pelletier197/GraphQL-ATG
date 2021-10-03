@@ -1,7 +1,7 @@
 export enum NullGenerationStrategy {
-  NEVER_NULL = 'NEVER_NULL',
-  ALWAYS_NULL = 'ALWAYS_NULL',
-  SOMETIMES_NULL = 'SOMETIMES_NULL',
+  NEVER_NULL = 'never',
+  ALWAYS_NULL = 'always',
+  SOMETIMES_NULL = 'sometimes',
 }
 
 export type GeneratorConfig = {
@@ -47,18 +47,24 @@ export type GraphQLFactoryContext = {
 
   /**
    * The default value provided by the GraphQL schema.
-   * 
+   *
    * By default, ATG will not use the default value provided in the schema, but you can DYI by providing factory that returns the default value.
    */
   readonly defaultValue?: unknown
 
   /**
    * The context for the default value provider that would be used otherwise.
-   * Can be useful if you want to perform custom actions and fallback to default.
+   * Can be useful if you want to perform custom actions and fallback to the default provider.
+   * Note that this factory is always the factory for a scalar value. Thus, if you create a factory for a [String!]!, then the default factory will return a String, not an array of strings. You will be required to return an array yourself.
    *
    * This property is only available when overriding the default generators.
    */
   readonly defaultFactory?: GraphQLFactoryContextDefault
+
+  /**
+   * The random factory that would be used to generate this object. This can be useful to fallback on a random object.
+   */
+  readonly randomFactory?: GraphQLFactoryContextDefault
 }
 
 export type GraphQLFactoryContextDefault = {

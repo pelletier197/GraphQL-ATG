@@ -1,5 +1,5 @@
 import { Headers } from '@lib/infrastructure/graphql/client'
-import { InvalidArgumentError, program } from 'commander'
+import { InvalidArgumentError, Option, program } from 'commander'
 import _ from 'lodash'
 
 import { GraphQLAtgConfig } from '../atg/config'
@@ -35,6 +35,18 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
       convertToFactoriesFile,
       []
     )
+    .addOption(
+      new Option(
+        '-gns, --generation.null-strategy <strategy>',
+        'Allow specifying if the default behaviour for nullable input values when there is no factory provided is to always use null values, sometimes use null values, or never use null values'
+      )
+        .choices([
+          NullGenerationStrategy.NEVER_NULL,
+          NullGenerationStrategy.ALWAYS_NULL,
+          NullGenerationStrategy.SOMETIMES_NULL,
+        ])
+        .default(NullGenerationStrategy.NEVER_NULL)
+    )
 
   program.parse(process.argv)
 
@@ -47,7 +59,7 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
     },
     generation: {
       maxDepth: options['generation.maxDepth'],
-      nullGenerationStrategy: NullGenerationStrategy.ALWAYS_NULL,
+      nullGenerationStrategy: options['generation.nullStrategy'],
       factories: await parseFactories(options['generation.factoriesFile']),
     },
     headers: options['headers'],
