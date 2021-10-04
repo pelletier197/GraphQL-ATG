@@ -5,7 +5,6 @@ import { GraphQLFactory } from '../config'
 
 export const DEFAULT_FACTORIES: Record<string, GraphQLFactory> = {
   String: (context) => {
-    console.log(context)
     switch (context.targetName.toLowerCase()) {
       case 'email':
       case 'emails':

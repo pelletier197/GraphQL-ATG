@@ -70,7 +70,7 @@ function validatedParseInt(value: string): number {
   const parsedValue = parseInt(value, 10)
 
   if (isNaN(parsedValue)) {
-    throw new InvalidArgumentError('Not a number')
+    throw new InvalidArgumentError(`Not a number: ${value}`)
   }
 
   return parsedValue
