@@ -82,7 +82,7 @@ async function yeah() {
       },
     ],
     {
-      exitOnError: false,
+      exitOnError: true,
       name: 'Super multi-tasking',
       concurrency: 3,
     }

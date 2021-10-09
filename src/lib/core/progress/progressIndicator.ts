@@ -1,6 +1,7 @@
 /* eslint-disable functional/immutable-data */
 
 import { Listr } from 'listr2'
+import { TaskWrapper } from 'listr2/dist/lib/task-wrapper'
 import ora from 'ora'
 
 const spinner = ora({
@@ -32,6 +33,20 @@ export function failed(reason?: string) {
   }
 }
 
+function taskAsContext(
+  wrapper: TaskWrapper<unknown, never>,
+  config: TaskConfig
+): TaskContext {
+  return {
+    updateName: (newName: string) => {
+      if (wrapper.errors.length === 0 || !config.exitOnError) {
+        wrapper.title = newName
+      }
+      return newName
+    },
+  }
+}
+
 export function newTask<T>(
   task: (context: TaskContext) => Promise<T>,
   config: TaskConfig
@@ -40,12 +55,7 @@ export function newTask<T>(
     {
       title: config.name,
       task: async (context, wrapper) => {
-        const result = await task({
-          updateName: (newName: string) => {
-            wrapper.title = newName
-            return newName
-          },
-        })
+        const result = await task(taskAsContext(wrapper, config))
 
         context.result = result
       },
@@ -78,14 +88,9 @@ export function newMultiTask<T>(
               task: async (subContext, subWrapper) => {
                 subWrapper.title = subTask.name
 
-                const result = await subTask.run({
-                  updateName: (newName: string) => {
-                    if (wrapper.errors.length === 0 || !config.exitOnError) {
-                      subWrapper.title = newName
-                    }
-                    return newName
-                  },
-                })
+                const result = await subTask.run(
+                  taskAsContext(subWrapper, config)
+                )
 
                 subContext.results.push(result)
               },
