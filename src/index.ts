@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { runGraphQLAtg } from '@lib/core/atg/graphqlAtg'
 // import { getAtgConfiguration } from '@lib/core/cli/cli'
-import { newMultiTask, newTask } from '@lib/core/progress/progressIndicator'
+import { newMultiTask } from '@lib/core/progress/progressIndicator'
 
 // async function run() {
 //   const config = await getAtgConfiguration()
@@ -16,24 +16,24 @@ import { newMultiTask, newTask } from '@lib/core/progress/progressIndicator'
 // }
 
 async function yeah() {
-  const task = newTask(
-    () => {
-      return new Promise((_, reject) => {
-        setTimeout(() => reject('potato'), 2000)
-      })
-    },
-    {
-      exitOnError: true,
-      name: 'YEAH',
-    }
-  )
+  //   const task = newTask(
+  //     () => {
+  //       return new Promise((_, reject) => {
+  //         setTimeout(() => reject('potato'), 2000)
+  //       })
+  //     },
+  //     {
+  //       exitOnError: true,
+  //       name: 'YEAH',
+  //     }
+  //   )
 
-  try {
-    const result = await task.start()
-    console.log(result)
-  } catch (error) {
-    console.log('error', error)
-  }
+  //   try {
+  //     const result = await task.start()
+  //     console.log(result)
+  //   } catch (error) {
+  //     console.log('error', error)
+  //   }
 
   const multiTask = newMultiTask(
     [
@@ -41,7 +41,7 @@ async function yeah() {
         name: 'Test 1',
         run: () => {
           return new Promise((_, reject) => {
-            setTimeout(() => reject('potato'), 1000)
+            setTimeout(() => reject('potato'), 4000)
           })
         },
       },
@@ -82,15 +82,15 @@ async function yeah() {
       },
     ],
     {
-      exitOnError: true,
+      exitOnError: false,
       name: 'Super multi-tasking',
-      concurrency: 2,
+      concurrency: 3,
     }
   )
 
   try {
     const result = await multiTask.start()
-    console.log(result)
+    console.log('result', result)
   } catch (error) {
     console.log('error', error)
   }

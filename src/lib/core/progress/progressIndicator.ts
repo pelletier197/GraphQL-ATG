@@ -1,6 +1,5 @@
 /* eslint-disable functional/immutable-data */
 
-import { Semaphore } from 'async-mutex'
 import { Listr } from 'listr2'
 import ora from 'ora'
 
@@ -53,6 +52,7 @@ export function newTask<T>(
     },
     {
       exitOnError: config.exitOnError,
+      concurrent: false,
     }
   )
 
@@ -64,50 +64,54 @@ export function newTask<T>(
 export function newMultiTask<T>(
   subTasks: ReadonlyArray<SubTask<T>>,
   config: MultiTaskConfig
-): Task<ReadonlyArray<T>> {
-  const semaphore = new Semaphore(Math.max(config.concurrency, 1))
-
+): Task<MultiTaskResult<T>> {
   const tasks = new Listr(
     {
       title: config.name,
-      task: async (context, wrapper) => {
+      task: (context, wrapper) => {
         context.results = []
 
-        wrapper.newListr(
+        return wrapper.newListr(
           subTasks.map((subTask: SubTask<T>) => {
             return {
               title: 'Pending...',
               task: async (subContext, subWrapper) => {
-                const [_, release] = await semaphore.acquire()
-
                 subWrapper.title = subTask.name
 
-                try {
-                  const result = await subTask.run({
-                    updateName: (newName: string) => {
+                const result = await subTask.run({
+                  updateName: (newName: string) => {
+                    if (wrapper.errors.length === 0 || !config.exitOnError) {
                       subWrapper.title = newName
-                      return newName
-                    },
-                  })
+                    }
+                    return newName
+                  },
+                })
 
-                  subContext.results.push(result)
-                } finally {
-                  release()
-                }
+                subContext.results.push(result)
               },
             }
-          })
+          }),
+          {
+            concurrent: Math.max(config.concurrency, 1),
+            exitOnError: config.exitOnError,
+          }
         )
       },
     },
     {
+      concurrent: false,
       exitOnError: config.exitOnError,
-      concurrent: true,
     }
   )
 
   return {
-    start: async () => (await tasks.run()).results,
+    start: async () => {
+      const context = await tasks.run()
+      return {
+        results: context.results,
+        errors: tasks.err.map((err) => err.error),
+      }
+    },
   }
 }
 
@@ -124,6 +128,11 @@ export type TaskConfig = {
 
 export type MultiTaskConfig = TaskConfig & {
   readonly concurrency: number
+}
+
+export type MultiTaskResult<T> = {
+  readonly results: ReadonlyArray<T>
+  readonly errors: ReadonlyArray<Error>
 }
 
 export type TaskContext = {
