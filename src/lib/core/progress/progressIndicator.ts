@@ -1,6 +1,6 @@
 /* eslint-disable functional/immutable-data */
-import { Semaphore } from 'semaphore-async-await'
 
+import { Semaphore } from 'async-mutex'
 import { Listr } from 'listr2'
 import ora from 'ora'
 
@@ -78,7 +78,7 @@ export function newMultiTask<T>(
             return {
               title: 'Pending...',
               task: async (subContext, subWrapper) => {
-                await semaphore.acquire()
+                const [_, release] = await semaphore.acquire()
 
                 subWrapper.title = subTask.name
 
@@ -92,7 +92,7 @@ export function newMultiTask<T>(
 
                   subContext.results.push(result)
                 } finally {
-                  semaphore.release()
+                  release()
                 }
               },
             }
