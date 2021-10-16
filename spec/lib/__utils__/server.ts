@@ -1,6 +1,6 @@
 import type { IResolvers } from '@graphql-tools/utils'
 import { ApolloServer } from 'apollo-server'
-import findFreePorts from 'find-free-ports'
+import {findFreePorts} from 'find-free-ports'
 
 export type TestGraphQLServer = {
   readonly url: string

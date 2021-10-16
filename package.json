@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "start": "run-p build && cd build; node --experimental-specifier-resolution=node index",
-    "run-test-server": "tsc -p tsconfig-testserver.json && tscpaths -p tsconfig-testserver.json -s . -o build-testserver && cp spec/lib/__utils__/farm/schema.json build-testserver/spec/lib/__utils__/farm ",
+    "start-test-server": "tsc -p tsconfig-testserver.json && tscpaths -p tsconfig-testserver.json -s . -o build-testserver && cp spec/lib/__utils__/farm/schema.json build-testserver/spec/lib/__utils__/farm && cd build-testserver/spec/lib/__utils__/farm; node --experimental-specifier-resolution=node -e 'import(\"./server.js\").then((module) => module.startFarmServer().then((server) => console.log(\"Running at \" + server.url)))'",
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig-build.json && tscpaths -p tsconfig-build.json -s src -o build",
     "fix": "run-s fix:*",
@@ -28,7 +28,7 @@
     "doc:json": "typedoc src/ --exclude **/*.spec.ts --target ES6 --mode file --json build/docs/typedoc.json",
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
-    "clean": "rm -r build coverage || true"
+    "clean": "rm -r build build-testserver coverage || true"
   },
   "engines": {
     "node": ">=10"
