@@ -4,7 +4,7 @@ import {
   queryBuilder,
   subSelectionBuilder,
 } from '@lib/core/graphql/query/builder'
-import { newTask } from '@lib/core/progress/progressIndicator'
+import { newTask } from '@lib/core/task/task'
 import _ from 'lodash'
 
 import { GraphQLQuery } from '../../../graphql/query/query'

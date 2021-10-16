@@ -1,7 +1,7 @@
 import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client'
 import { minify, prettify } from '@lib/core/graphql/gql'
 import { GraphQLQuery } from '@lib/core/graphql/query/query'
-import { newMultiTask } from '@lib/core/progress/progressIndicator'
+import { newMultiTask } from '@lib/core/task/task'
 
 import { LoggingConfig } from '../logging/config'
 

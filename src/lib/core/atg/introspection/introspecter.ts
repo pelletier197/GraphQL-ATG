@@ -1,6 +1,6 @@
 import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client'
 import { GraphQLQueryError } from '@lib/core/graphql/error'
-import { newTask } from '@lib/core/progress/progressIndicator'
+import { newTask } from '@lib/core/task/task'
 
 import { IntrospectionQueryConfig } from './config'
 import { INTROSPECTION_QUERY } from './query'
