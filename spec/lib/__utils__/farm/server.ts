@@ -2,6 +2,8 @@ import { GraphQLIntrospectionResult } from '@lib/core/atg/introspection/types'
 import gql from '@lib/core/graphql/gql'
 import omitDeep from 'omit-deep-lodash'
 
+import farmSchema from './schema.json'
+
 import { startTestServer, TestGraphQLServer } from '../server'
 
 enum AnimalNutrition {
@@ -294,8 +296,8 @@ const resolvers = {
   },
 }
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-export const INTROSPECTION_SCHEMA: GraphQLIntrospectionResult = require('./schema.json')
+export const INTROSPECTION_SCHEMA =
+  farmSchema as unknown as GraphQLIntrospectionResult
 
 export async function startFarmServer(): Promise<TestGraphQLServer> {
   return startTestServer(schema, resolvers)

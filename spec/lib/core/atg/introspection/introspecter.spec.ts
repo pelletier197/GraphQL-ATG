@@ -1,10 +1,12 @@
 import { introspect } from '@lib/core/atg/introspection/introspecter'
+import { INTROSPECTION_QUERY } from '@lib/core/atg/introspection/query'
 import { createClient } from '@lib/infrastructure/graphql/client'
 import {
   INTROSPECTION_SCHEMA,
   startFarmServer,
 } from '@test/__utils__/farm/server'
 import { lazy } from '@test/__utils__/lazy'
+import _ from 'lodash'
 
 const server = lazy(startFarmServer)
 const client = lazy(async () => createClient((await server()).url))

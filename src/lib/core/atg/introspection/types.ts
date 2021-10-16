@@ -51,7 +51,7 @@ export type InputValue = {
 export type TypeRef = {
   readonly kind: Kind
   readonly name?: string
-  readonly ofType: TypeRef | null | undefined
+  readonly ofType?: TypeRef
 }
 
 export enum Kind {
