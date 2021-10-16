@@ -4,7 +4,7 @@ import {
   EXPECTED_ALL_ANIMALS_QUERY_RESULT,
   QUERY_ALL_ANIMALS,
   startFarmServer,
-} from '@test/__utils__/farm/server'
+} from 'src/utils/testServer/farm/server'
 import { lazy } from '@test/__utils__/lazy'
 
 const server = lazy(startFarmServer)

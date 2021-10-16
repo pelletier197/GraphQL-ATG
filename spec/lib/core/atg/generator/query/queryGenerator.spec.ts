@@ -1,4 +1,7 @@
-import { GeneratorConfig } from '@lib/core/atg/generator/config'
+import {
+  GeneratorConfig,
+  NullGenerationStrategy,
+} from '@lib/core/atg/generator/config'
 import { GraphQLIntrospectionResultError } from '@lib/core/atg/generator/error'
 import { generateGraphQLQueries } from '@lib/core/atg/generator/query/queryGenerator'
 import gql, { minify, prettify } from '@lib/core/graphql/gql'
@@ -8,12 +11,13 @@ import { INTROSPECTION_SCHEMA } from '@test/__utils__/farm/server'
 const DEFAULT_CONFIG: GeneratorConfig = {
   factories: {},
   maxDepth: 8,
+  nullGenerationStrategy: NullGenerationStrategy.NEVER_NULL,
 }
 
 describe('generating graphql queries', () => {
   describe('introspection query has no root query type', () => {
-    it('should generate no queries', () => {
-      const result = generateGraphQLQueries(
+    it('should generate no queries', async () => {
+      const result = await generateGraphQLQueries(
         {
           __schema: {
             directives: [],
@@ -28,8 +32,8 @@ describe('generating graphql queries', () => {
   })
 
   describe('introspection query max depth configuration is too low', () => {
-    it('should generate no queries', () => {
-      const result = generateGraphQLQueries(INTROSPECTION_SCHEMA, {
+    it('should generate no queries', async () => {
+      const result = await generateGraphQLQueries(INTROSPECTION_SCHEMA, {
         ...DEFAULT_CONFIG,
         maxDepth: 2,
       })
@@ -39,8 +43,8 @@ describe('generating graphql queries', () => {
   })
 
   describe('introspection query max depth configuration has an acceptable depth for root fields', () => {
-    it('should generate a query that goes up to the max depth', () => {
-      const result = generateGraphQLQueries(INTROSPECTION_SCHEMA, {
+    it('should generate a query that goes up to the max depth', async () => {
+      const result = await generateGraphQLQueries(INTROSPECTION_SCHEMA, {
         ...DEFAULT_CONFIG,
         maxDepth: 4,
       })
@@ -66,23 +70,24 @@ describe('generating graphql queries', () => {
 
   describe('introspection query has a root query type, but the root type does not exist in the types list', () => {
     it('should generate no queries', () => {
-      expect(() =>
-        generateGraphQLQueries(
-          {
-            __schema: {
-              queryType: { name: 'Query' },
-              directives: [],
-              types: [],
+      expect(
+        async () =>
+          await generateGraphQLQueries(
+            {
+              __schema: {
+                queryType: { name: 'Query' },
+                directives: [],
+                types: [],
+              },
             },
-          },
-          DEFAULT_CONFIG
-        )
+            DEFAULT_CONFIG
+          )
       ).toThrowError(GraphQLIntrospectionResultError)
     })
   })
 
-  it('should run', () => {
-    const generatedQueries = generateGraphQLQueries(
+  it('should run', async () => {
+    const generatedQueries = await generateGraphQLQueries(
       INTROSPECTION_SCHEMA,
       DEFAULT_CONFIG
     )

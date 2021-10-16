@@ -4,7 +4,7 @@ import {
   queryBuilder,
   subSelectionBuilder,
 } from '@lib/core/graphql/query/builder'
-import { start, succeed } from '@lib/core/progress/progressIndicator'
+import { newTask } from '@lib/core/progress/progressIndicator'
 import _ from 'lodash'
 
 import { GraphQLQuery } from '../../../graphql/query/query'
@@ -25,35 +25,43 @@ const DEFAULT_CONFIG: GeneratorConfig = {
   factories: {},
 }
 
-export function generateGraphQLQueries(
+export async function generateGraphQLQueries(
   introspectionResult: GraphQLIntrospectionResult,
   config?: Partial<GeneratorConfig>
-): ReadonlyArray<GraphQLQuery> {
-  start('Generate queries')
-  const mergedConfig = Object.assign({}, DEFAULT_CONFIG, config)
+): Promise<ReadonlyArray<GraphQLQuery>> {
+  const task = newTask<ReadonlyArray<GraphQLQuery>>(
+    async () => {
+      const mergedConfig = Object.assign({}, DEFAULT_CONFIG, config)
 
-  const schema = introspectionResult.__schema
+      const schema = introspectionResult.__schema
 
-  // There is no query type, so no queries can be generated
-  if (!schema.queryType) return []
+      // There is no query type, so no queries can be generated
+      if (!schema.queryType) return []
 
-  const typesByName: TypesByName = _.keyBy(schema.types, (type) => type.name)
+      const typesByName: TypesByName = _.keyBy(
+        schema.types,
+        (type) => type.name
+      )
 
-  const rootQueryType = getRequiredType(schema.queryType.name, typesByName)
-  if (!rootQueryType.fields) return []
+      const rootQueryType = getRequiredType(schema.queryType.name, typesByName)
+      if (!rootQueryType.fields) return []
 
-  const initialBuilder = queryBuilder()
+      const initialBuilder = queryBuilder()
 
-  const result = rootQueryType.fields
-    .map((field) => {
-      return buildField(initialBuilder, field, typesByName, mergedConfig, 1)
-    })
-    .filter((x) => x !== initialBuilder)
-    .map((x) => x.build())
+      return rootQueryType.fields
+        .map((field) => {
+          return buildField(initialBuilder, field, typesByName, mergedConfig, 1)
+        })
+        .filter((x) => x !== initialBuilder)
+        .map((x) => x.build())
+    },
+    {
+      exitOnError: true,
+      name: 'Generate queries',
+    }
+  )
 
-  succeed()
-
-  return result
+  return await task.start()
 }
 
 function generateField(

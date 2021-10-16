@@ -43,7 +43,6 @@
     "listr2": "^3.12.2",
     "lodash": "^4.17.21",
     "micromatch": "^4.0.4",
-    "ora": "^6.0.1",
     "prettier": "^2.4.0"
   },
   "devDependencies": {

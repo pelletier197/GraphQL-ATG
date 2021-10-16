@@ -1,17 +1,12 @@
 import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client'
 import { minify, prettify } from '@lib/core/graphql/gql'
 import { GraphQLQuery } from '@lib/core/graphql/query/query'
-import {
-  failed,
-  info,
-  start,
-  succeed,
-} from '@lib/core/progress/progressIndicator'
+import { newMultiTask } from '@lib/core/progress/progressIndicator'
 
 import { LoggingConfig } from '../logging/config'
 
 import { RunnerConfig } from './config'
-import { createProgress, Progress } from './progress'
+import { FailedGraphQLRequestError } from './error'
 
 export type QueryExecutionResultDetails = {
   /**
@@ -60,76 +55,84 @@ export async function executeQueries(
   loggingConfig: LoggingConfig,
   runnerConfig: RunnerConfig
 ): Promise<QueryExecutionResults> {
-  const progress = createProgress(queries.length)
+  const task = newMultiTask<QueryExecutionResultDetails>(
+    queries.map((query, index) => {
+      return {
+        name: `Query ${index}`,
+        run: async () => await runQuery(query, client, loggingConfig),
+      }
+    }),
+    {
+      concurrency: runnerConfig.concurrency,
+      exitOnError: runnerConfig.failFast,
+      name: 'Executing auto-generated queries',
+    }
+  )
 
-  // eslint-disable-next-line functional/no-let
-  let results: ReadonlyArray<QueryExecutionResultDetails> = []
-
-  // eslint-disable-next-line functional/no-loop-statement
-  for (const query of queries) {
-    results = [
-      ...results,
-      await runQuery(query, client, progress, loggingConfig, runnerConfig),
+  try {
+    const multiTaskResult = await task.start()
+    const allDetails = [
+      ...multiTaskResult.results,
+      ...multiTaskResult.errors.map((error) => convertError(error)),
     ]
+    return {
+      resultDetails: allDetails,
+      failed: allDetails.filter((result) => !result.isSuccessful).length,
+      successful: allDetails.filter((result) => result.isSuccessful).length,
+      executionTimeMilliseconds: allDetails.reduce(
+        (previous: number, current: QueryExecutionResultDetails) =>
+          previous + current.executionTimeMilliseconds,
+        0
+      ),
+    }
+  } catch (error) {
+    const converted = convertError(error)
+
+    return {
+      executionTimeMilliseconds: converted.executionTimeMilliseconds,
+      failed: 1,
+      successful: 0,
+      resultDetails: [converted],
+    }
+  }
+}
+
+function convertError(error: unknown): QueryExecutionResultDetails {
+  if (error instanceof FailedGraphQLRequestError) {
+    return error.details
   }
 
-  return {
-    resultDetails: results,
-    failed: results.filter((result) => !result.isSuccessful).length,
-    successful: results.filter((result) => result.isSuccessful).length,
-    executionTimeMilliseconds: results.reduce(
-      (previous: number, current: QueryExecutionResultDetails) =>
-        previous + current.executionTimeMilliseconds,
-      0
-    ),
-  }
+  throw error
 }
 
 async function runQuery(
   query: GraphQLQuery,
   client: GraphQLClient,
-  progress: Progress,
-  loggingConfig: LoggingConfig,
-  runnerConfig: RunnerConfig
+  loggingConfig: LoggingConfig
 ): Promise<QueryExecutionResultDetails> {
   if (loggingConfig.printQueries) {
-    const output = loggingConfig.prettify
-      ? prettify(query.query)
-      : minify(query.query)
-
-    info(`Running query: \n${output}`)
+    loggingConfig.prettify ? prettify(query.query) : minify(query.query)
 
     if (loggingConfig.printVariables) {
-      const variablesOutput = loggingConfig.prettify
+      loggingConfig.prettify
         ? JSON.stringify(query.variables, null, 2)
         : JSON.stringify(query.variables)
-
-      info(`With variables: \n${variablesOutput}`)
     }
   }
 
-  start(`Execute query ${progress.increment()}`)
   const before = new Date().getUTCMilliseconds()
   const result = await client.request(query.query, query.variables)
 
-  if (result.errors.length > 0) {
-    failed(
-      `Errors were returned by the endpoint:\n${result.errors.map(
-        (error) => `  - ${error.message}`
-      )}`
-    )
-
-    if (runnerConfig.failFast) {
-      throw new Error('reee')
-    }
-  } else {
-    succeed()
-  }
-
-  return {
+  const details = {
     executionTimeMilliseconds: new Date().getUTCMilliseconds() - before,
     isSuccessful: result.errors.length === 0,
     query: query,
     response: result,
   }
+
+  if (result.errors.length > 0) {
+    throw new FailedGraphQLRequestError(details)
+  }
+
+  return details
 }
