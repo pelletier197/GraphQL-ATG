@@ -71,18 +71,17 @@ describe('generating graphql queries', () => {
   describe('introspection query has a root query type, but the root type does not exist in the types list', () => {
     it('should generate no queries', () => {
       expect(
-        async () =>
-          await generateGraphQLQueries(
-            {
-              __schema: {
-                queryType: { name: 'Query' },
-                directives: [],
-                types: [],
-              },
+        generateGraphQLQueries(
+          {
+            __schema: {
+              queryType: { name: 'Query' },
+              directives: [],
+              types: [],
             },
-            DEFAULT_CONFIG
-          )
-      ).toThrowError(GraphQLIntrospectionResultError)
+          },
+          DEFAULT_CONFIG
+        )
+      ).rejects.toBeInstanceOf(GraphQLIntrospectionResultError)
     })
   })
 
