@@ -6,6 +6,7 @@ import { TaskWrapper } from 'listr2/dist/lib/task-wrapper'
 const RENDERER_OPTIONS: ListrDefaultRendererOptions<ListrRendererValue> = {
   rendererOptions: {
     formatOutput: 'wrap',
+    collapse: false,
   },
 }
 
