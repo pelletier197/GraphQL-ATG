@@ -4,7 +4,8 @@
     "rootDir": ".",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "outDir": "build-testserver"
+    "outDir": "build-testserver",
+    "tsBuildInfoFile": "./buildcache/tsconfig-testserver.tsbuildinfo"
   },
   "include": ["spec/**/*.spec.ts"]
 }

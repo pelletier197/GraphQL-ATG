@@ -19,7 +19,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
-
+    "tsBuildInfoFile": "./buildcache/tsconfig-build.tsbuildinfo",
     "pretty": true,
     "lib": ["es2017"],
     "types": ["node", "jest"],
