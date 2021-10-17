@@ -98,7 +98,7 @@ const schema = gql`
   }
 
   enum CookingMode {
-    NO_COOKING_KEEPS_ALL_NUTRIMENTS
+    NO_COOKING_TO_KEEP_ALL_NUTRIMENTS
     OVEN
     BOILING
     MICRO_WAVE
@@ -303,4 +303,3 @@ export const INTROSPECTION_SCHEMA =
 export async function startFarmServer(): Promise<TestGraphQLServer> {
   return startTestServer(schema, resolvers)
 }
-CookingMode
