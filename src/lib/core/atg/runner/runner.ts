@@ -1,9 +1,6 @@
 import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client'
-import { minify, prettify } from '@lib/core/graphql/gql'
 import { GraphQLQuery } from '@lib/core/graphql/query/query'
 import { newMultiTask } from '@lib/core/task/task'
-
-import { LoggingConfig } from '../logging/config'
 
 import { RunnerConfig } from './config'
 import { FailedGraphQLRequestError } from './error'
@@ -18,7 +15,7 @@ export type QueryExecutionResultDetails = {
    */
   readonly response: GraphQLResponse<unknown>
   /**
-   * Wether or not the request was successful
+   * WetherTaskContext or not the request was successful
    */
   readonly isSuccessful: boolean
   /**
@@ -49,22 +46,28 @@ export type QueryExecutionResults = {
   readonly executionTimeMilliseconds: number
 }
 
+const DEFAULT_RUNNER_CONFIG: RunnerConfig = {
+  concurrency: 1,
+  failFast: false,
+}
+
 export async function executeQueries(
   client: GraphQLClient,
   queries: ReadonlyArray<GraphQLQuery>,
-  loggingConfig: LoggingConfig,
-  runnerConfig: RunnerConfig
+  config?: Partial<RunnerConfig>
 ): Promise<QueryExecutionResults> {
+  const actualConfig = Object.assign({}, DEFAULT_RUNNER_CONFIG, config)
+
   const task = newMultiTask<QueryExecutionResultDetails>(
     queries.map((query, index) => {
       return {
-        name: `Query ${index}`,
-        run: async () => await runQuery(query, client, loggingConfig),
+        name: `Query ${index + 1}`,
+        run: async () => await runQuery(query, client),
       }
     }),
     {
-      concurrency: runnerConfig.concurrency,
-      exitOnError: runnerConfig.failFast,
+      concurrency: actualConfig.concurrency,
+      exitOnError: actualConfig.failFast,
       name: 'Executing auto-generated queries',
     }
   )
@@ -107,19 +110,8 @@ function convertError(error: unknown): QueryExecutionResultDetails {
 
 async function runQuery(
   query: GraphQLQuery,
-  client: GraphQLClient,
-  loggingConfig: LoggingConfig
+  client: GraphQLClient
 ): Promise<QueryExecutionResultDetails> {
-  if (loggingConfig.printQueries) {
-    loggingConfig.prettify ? prettify(query.query) : minify(query.query)
-
-    if (loggingConfig.printVariables) {
-      loggingConfig.prettify
-        ? JSON.stringify(query.variables, null, 2)
-        : JSON.stringify(query.variables)
-    }
-  }
-
   const before = new Date().getUTCMilliseconds()
   const result = await client.request(query.query, query.variables)
 

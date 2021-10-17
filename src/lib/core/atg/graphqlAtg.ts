@@ -13,19 +13,10 @@ export async function runGraphQLAtg(config: GraphQLAtgConfig) {
     introspectionResult,
     config.generation
   )
-  await executeQueries(
-    client,
-    allQueries,
-    {
-      prettify: true,
-      printQueries: false,
-      printVariables: true,
-    },
-    {
-      concurrency: 3,
-      failFast: false,
-    }
-  )
+  await executeQueries(client, allQueries, {
+    concurrency: 3,
+    failFast: false,
+  })
   // TODO - run those queries, store the results, etc
   allQueries.forEach(() => {
     // console.log(prettify(query.query))

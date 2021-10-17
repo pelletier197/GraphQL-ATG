@@ -47,6 +47,17 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
         ])
         .default(NullGenerationStrategy.NEVER_NULL)
     )
+    .option(
+      '-rc, --runner.concurrency',
+      'The number of parallel queries to execute',
+      validatedParseInt,
+      1
+    )
+    .option(
+      '-rff, --runner.fail-fast',
+      'Either the tests should stop after the first error is encountered, or keep running until all queries have been executed',
+      false
+    )
 
   program.parse(process.argv)
 
@@ -54,6 +65,7 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
 
   return {
     endpoint: options['endpoint'],
+    headers: options['headers'],
     introspection: {
       includeDeprecated: options['introspection.includeDeprecated'],
     },
@@ -62,7 +74,10 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
       nullGenerationStrategy: options['generation.nullStrategy'],
       factories: await parseFactories(options['generation.factoriesFile']),
     },
-    headers: options['headers'],
+    runner: {
+      concurrency: options['runner.concurrency'],
+      failFast: options['runner.failFast'],
+    },
   }
 }
 

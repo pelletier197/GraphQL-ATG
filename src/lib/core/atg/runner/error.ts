@@ -1,7 +1,7 @@
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/no-class */
 
-import { minify } from '@lib/core/graphql/gql'
+import { prettify } from '@lib/core/graphql/gql'
 
 import { QueryExecutionResultDetails } from './runner'
 
@@ -14,8 +14,8 @@ export class FailedGraphQLRequestError extends Error {
         (error) => `\t - ${error.message}`
       )}
       
-      Query: ${minify(details.query.query)}
-      Variables: ${JSON.stringify(details.query.variables)}
+      Query: ${prettify(details.query.query)}
+      Variables: ${JSON.stringify(details.query.variables, null, 2)}
       `
     )
 

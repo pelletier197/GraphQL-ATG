@@ -7,6 +7,7 @@ const RENDERER_OPTIONS: ListrDefaultRendererOptions<ListrRendererValue> = {
   rendererOptions: {
     formatOutput: 'wrap',
     collapse: false,
+    clearOutput: false,
   },
 }
 
@@ -14,12 +15,20 @@ function taskAsContext(
   wrapper: TaskWrapper<unknown, never>,
   config: TaskConfig
 ): TaskContext {
+  function canUpdate() {
+    return wrapper.errors.length === 0 || !config.exitOnError
+  }
+
   return {
+    logInfo: (info: string) => {
+      if (canUpdate()) {
+        wrapper.output = (wrapper.output || '') + info
+      }
+    },
     updateName: (newName: string) => {
-      if (wrapper.errors.length === 0 || !config.exitOnError) {
+      if (canUpdate()) {
         wrapper.title = newName
       }
-      return newName
     },
   }
 }
@@ -120,7 +129,8 @@ export type MultiTaskResult<T> = {
 }
 
 export type TaskContext = {
-  readonly updateName: (newName: string) => string
+  readonly logInfo: (info: string) => void
+  readonly updateName: (newName: string) => void
 }
 
 export type Task<T> = {
