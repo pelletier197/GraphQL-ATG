@@ -2,6 +2,7 @@
 /* eslint-disable functional/no-class */
 
 import { minify } from '@lib/core/graphql/gql'
+
 import { QueryExecutionResultDetails } from './runner'
 
 export class FailedGraphQLRequestError extends Error {
