@@ -5,6 +5,7 @@ import omitDeep from 'omit-deep-lodash'
 import farmSchema from './schema.json'
 
 import { startTestServer, TestGraphQLServer } from '../server'
+import _ from 'lodash'
 
 enum AnimalNutrition {
   HERBIVORE,
@@ -302,3 +303,4 @@ export const INTROSPECTION_SCHEMA =
 export async function startFarmServer(): Promise<TestGraphQLServer> {
   return startTestServer(schema, resolvers)
 }
+CookingMode

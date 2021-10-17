@@ -1,10 +1,12 @@
 /* eslint-disable functional/immutable-data */
 
-import { Listr, ListrGetRendererOptions, ListrRendererValue } from 'listr2'
-import { TaskWrapper } from 'listr2/dist/ib/task-wrapper'
+import { Listr, ListrDefaultRendererOptions, ListrRendererValue } from 'listr2'
+import { TaskWrapper } from 'listr2/dist/lib/task-wrapper'
 
-const RENDERER_OPTIONS = {
-  formatOutput: 'wrap',
+const RENDERER_OPTIONS: ListrDefaultRendererOptions<ListrRendererValue> = {
+  rendererOptions: {
+    formatOutput: 'wrap',
+  },
 }
 
 function taskAsContext(
@@ -37,6 +39,7 @@ export function newTask<T>(
     {
       exitOnError: config.exitOnError,
       concurrent: false,
+      ...RENDERER_OPTIONS,
     }
   )
 
@@ -80,7 +83,7 @@ export function newMultiTask<T>(
     {
       concurrent: false,
       exitOnError: config.exitOnError,
-      rendererOptions: RENDERER_OPTIONS,
+      ...RENDERER_OPTIONS,
     }
   )
 
