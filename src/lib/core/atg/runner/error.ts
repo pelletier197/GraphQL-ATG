@@ -10,12 +10,12 @@ export class FailedGraphQLRequestError extends Error {
 
   constructor(details: QueryExecutionResultDetails) {
     super(
-      `GraphQL request failed with errors \n${details.response.errors.map(
-        (error) => `\t - ${error.message}`
-      )}
-      
-      Query: ${prettify(details.query.query)}
-      Variables: ${JSON.stringify(details.query.variables, null, 2)}
+      `
+GraphQL request failed with errors 
+${details.response.errors.map((error) => `   - ${error.message}`)}
+
+Query: ${prettify(details.query.query)}
+Variables: ${JSON.stringify(details.query.variables, null, 2)}
       `
     )
 

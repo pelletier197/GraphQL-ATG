@@ -7,7 +7,9 @@ const RENDERER_OPTIONS: ListrDefaultRendererOptions<ListrRendererValue> = {
   rendererOptions: {
     formatOutput: 'wrap',
     collapse: false,
-    clearOutput: false,
+    showErrorMessage: true,
+    collapseErrors: false,
+    indentation: 3,
   },
 }
 
@@ -20,11 +22,6 @@ function taskAsContext(
   }
 
   return {
-    logInfo: (info: string) => {
-      if (canUpdate()) {
-        wrapper.output = (wrapper.output || '') + info
-      }
-    },
     updateName: (newName: string) => {
       if (canUpdate()) {
         wrapper.title = newName
@@ -129,7 +126,6 @@ export type MultiTaskResult<T> = {
 }
 
 export type TaskContext = {
-  readonly logInfo: (info: string) => void
   readonly updateName: (newName: string) => void
 }
 
