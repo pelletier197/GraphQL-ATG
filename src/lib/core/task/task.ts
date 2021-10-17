@@ -10,6 +10,7 @@ const RENDERER_OPTIONS: ListrDefaultRendererOptions<ListrRendererValue> = {
     showErrorMessage: true,
     collapseErrors: false,
     indentation: 3,
+    removeEmptyLines: false,
   },
 }
 

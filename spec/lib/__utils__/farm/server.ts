@@ -272,7 +272,6 @@ const resolvers = {
   },
   Animals: {
     all: (_: unknown, args: AllAnimalArgs) => {
-      throw Error('sdfsdf')
       return ALL_ANIMALS.filter(
         (animal: Animal) => !args.name || animal.name.includes(args.name)
       )
