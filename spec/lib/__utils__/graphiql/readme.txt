@@ -1,0 +1,1 @@
+https://github.com/graphql/graphiql/blob/main/packages/graphiql/test/schema.js

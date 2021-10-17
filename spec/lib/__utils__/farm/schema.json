@@ -580,7 +580,7 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "NO_COOKING_KEEPS_ALL_NUTRIMENTS",
+            "name": "NO_COOKING_TO_KEEP_ALL_NUTRIMENTS",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
