@@ -14,7 +14,6 @@ jobs:
           paths:
             - .yarn/cache
             - .yarn/unplugged
-            - node_modules
           key: yarn-packages-{{ checksum "yarn.lock" }}
       - run: yarn build
       - save_cache:
@@ -29,6 +28,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn install --immutable
       - run: yarn test
   'test-node-latest':
     docker:
@@ -38,6 +38,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn install --immutable
       - run: yarn test
   'deploy':
     docker:
@@ -47,7 +48,6 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
             - yarn-build
       - run: yarn publish --non-interactive
 
