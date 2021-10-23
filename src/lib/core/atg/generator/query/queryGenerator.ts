@@ -3,21 +3,21 @@ import {
   QueryBuilder,
   queryBuilder,
   subSelectionBuilder,
-} from '@lib/core/graphql/query/builder'
-import { newTask } from '@lib/core/task/task'
+} from '@lib/core/graphql/query/builder.js'
+import { newTask } from '@lib/core/task/task.js'
 import _ from 'lodash'
 
-import { GraphQLQuery } from '../../../graphql/query/query'
+import { GraphQLQuery } from '../../../graphql/query/query.js'
 import {
   Field,
   FullType,
   GraphQLIntrospectionResult,
-} from '../../introspection/types'
-import { GeneratorConfig, NullGenerationStrategy } from '../config'
+} from '../../introspection/types.js'
+import { GeneratorConfig, NullGenerationStrategy } from '../config.js'
 
-import { getRequiredType, isLeaf, unwrapFieldType } from './extractor'
-import { generateArgsForField } from './fakeGenerator'
-import { TypesByName } from './types'
+import { getRequiredType, isLeaf, unwrapFieldType } from './extractor.js'
+import { generateArgsForField } from './fakeGenerator.js'
+import { TypesByName } from './types.js'
 
 const DEFAULT_CONFIG: GeneratorConfig = {
   maxDepth: 5,

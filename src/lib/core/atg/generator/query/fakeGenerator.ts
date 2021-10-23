@@ -1,4 +1,4 @@
-import { Parameter } from '@lib/core/graphql/query/builder'
+import { Parameter } from '@lib/core/graphql/query/builder.js'
 import _ from 'lodash'
 import micromatch from 'micromatch'
 
@@ -8,15 +8,15 @@ import {
   InputValue,
   Kind,
   TypeRef,
-} from '../../introspection/types'
+} from '../../introspection/types.js'
 import {
   GeneratorConfig,
   GraphQLFactory,
   NullGenerationStrategy,
-} from '../config'
-import { GraphQLGenerationError } from '../error'
+} from '../config.js'
+import { GraphQLGenerationError } from '../error.js'
 
-import { DEFAULT_FACTORIES } from './defaultFactories'
+import { DEFAULT_FACTORIES } from './defaultFactories.js'
 import {
   createIntrospectionError,
   isList,
@@ -25,8 +25,8 @@ import {
   unwrapList,
   unwrapNonNull,
   unwrapType,
-} from './extractor'
-import { TypesByName } from './types'
+} from './extractor.js'
+import { TypesByName } from './types.js'
 
 export function generateArgsForField(
   field: Field,

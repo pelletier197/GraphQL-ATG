@@ -1,9 +1,9 @@
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/no-class */
 
-import { minify, prettify } from '@lib/core/graphql/gql'
+import { minify, prettify } from '@lib/core/graphql/gql.js'
 
-import { QueryExecutionResultDetails } from './runner'
+import { QueryExecutionResultDetails } from './runner.js'
 
 export class FailedGraphQLRequestError extends Error {
   readonly details: QueryExecutionResultDetails

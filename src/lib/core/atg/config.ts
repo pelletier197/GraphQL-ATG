@@ -1,8 +1,8 @@
-import { Headers } from '@lib/infrastructure/graphql/client'
+import { Headers } from '@lib/infrastructure/graphql/client.js'
 
-import { GeneratorConfig } from './generator/config'
-import { IntrospectionQueryConfig } from './introspection/config'
-import { RunnerConfig } from './runner/config'
+import { GeneratorConfig } from './generator/config.js'
+import { IntrospectionQueryConfig } from './introspection/config.js'
+import { RunnerConfig } from './runner/config.js'
 
 export type GraphQLAtgConfig = {
   readonly endpoint: string

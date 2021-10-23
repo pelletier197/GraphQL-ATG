@@ -1,6 +1,6 @@
 import faker from 'faker'
 
-import { GraphQLFactory } from '../config'
+import { GraphQLFactory } from '../config.js'
 
 export const DEFAULT_FACTORIES: Record<string, GraphQLFactory> = {
   String: (context) => {

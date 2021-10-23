@@ -1,5 +1,5 @@
-import { runGraphQLAtg } from '@lib/core/atg/graphqlAtg'
-import { getAtgConfiguration } from '@lib/core/cli/cli'
+import { runGraphQLAtg } from '@lib/core/atg/graphqlAtg.js'
+import { getAtgConfiguration } from '@lib/core/cli/cli.js'
 
 async function run() {
   const config = await getAtgConfiguration()

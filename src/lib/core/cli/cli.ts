@@ -1,9 +1,12 @@
-import { Headers } from '@lib/infrastructure/graphql/client'
+import { Headers } from '@lib/infrastructure/graphql/client.js'
 import { InvalidArgumentError, Option, program } from 'commander'
 import _ from 'lodash'
 
-import { GraphQLAtgConfig } from '../atg/config'
-import { GraphQLFactory, NullGenerationStrategy } from '../atg/generator/config'
+import { GraphQLAtgConfig } from '../atg/config.js'
+import {
+  GraphQLFactory,
+  NullGenerationStrategy,
+} from '../atg/generator/config.js'
 
 export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
   const version = process.env.npm_package_version || 'unknown'

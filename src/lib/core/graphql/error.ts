@@ -1,7 +1,7 @@
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/no-class */
 
-import { GraphQLResponse } from './client'
+import { GraphQLResponse } from './client.js'
 
 export class GraphQLQueryError<T> extends Error {
   readonly response: GraphQLResponse<T>

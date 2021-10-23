@@ -4,10 +4,10 @@ import {
   InputValue,
   Kind,
   TypeRef,
-} from '../../introspection/types'
-import { GraphQLIntrospectionResultError } from '../error'
+} from '../../introspection/types.js'
+import { GraphQLIntrospectionResultError } from '../error.js'
 
-import { TypesByName } from './types'
+import { TypesByName } from './types.js'
 
 export function unwrapFieldType(
   field: Field,

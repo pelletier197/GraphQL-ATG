@@ -3,7 +3,7 @@
 /* eslint-disable functional/no-class */
 import _ from 'lodash'
 
-import { GraphQLQuery } from './query'
+import { GraphQLQuery } from './query.js'
 
 export enum QueryType {
   QUERY = 'query',

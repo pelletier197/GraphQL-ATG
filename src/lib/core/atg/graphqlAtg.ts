@@ -1,9 +1,9 @@
-import { createClient } from '@lib/infrastructure/graphql/client'
+import { createClient } from '@lib/infrastructure/graphql/client.js'
 
-import { GraphQLAtgConfig } from './config'
-import { generateGraphQLQueries } from './generator/query/queryGenerator'
-import { introspect } from './introspection/introspecter'
-import { executeQueries, QueryExecutionResults } from './runner/runner'
+import { GraphQLAtgConfig } from './config.js'
+import { generateGraphQLQueries } from './generator/query/queryGenerator.js'
+import { introspect } from './introspection/introspecter.js'
+import { executeQueries, QueryExecutionResults } from './runner/runner.js'
 
 export async function runGraphQLAtg(
   config: GraphQLAtgConfig

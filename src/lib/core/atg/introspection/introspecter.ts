@@ -1,10 +1,10 @@
-import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client'
-import { GraphQLQueryError } from '@lib/core/graphql/error'
-import { newTask } from '@lib/core/task/task'
+import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client.js'
+import { GraphQLQueryError } from '@lib/core/graphql/error.js'
+import { newTask } from '@lib/core/task/task.js'
 
-import { IntrospectionQueryConfig } from './config'
-import { INTROSPECTION_QUERY } from './query'
-import { GraphQLIntrospectionResult } from './types'
+import { IntrospectionQueryConfig } from './config.js'
+import { INTROSPECTION_QUERY } from './query.js'
+import { GraphQLIntrospectionResult } from './types.js'
 
 const DEFAULT_INTROSPECTION_CONFIG: IntrospectionQueryConfig = {
   includeDeprecated: true,

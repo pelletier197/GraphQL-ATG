@@ -1,12 +1,12 @@
 import {
   GeneratorConfig,
   NullGenerationStrategy,
-} from '@lib/core/atg/generator/config'
-import { GraphQLIntrospectionResultError } from '@lib/core/atg/generator/error'
-import { generateGraphQLQueries } from '@lib/core/atg/generator/query/queryGenerator'
-import gql, { minify, prettify } from '@lib/core/graphql/gql'
-import { GraphQLQuery } from '@lib/core/graphql/query/query'
-import { INTROSPECTION_SCHEMA } from '@test/__utils__/farm/server'
+} from '@lib/core/atg/generator/config.js'
+import { GraphQLIntrospectionResultError } from '@lib/core/atg/generator/error.js'
+import { generateGraphQLQueries } from '@lib/core/atg/generator/query/queryGenerator.js'
+import gql, { minify, prettify } from '@lib/core/graphql/gql.js'
+import { GraphQLQuery } from '@lib/core/graphql/query/query.js'
+import { INTROSPECTION_SCHEMA } from '@test/__utils__/farm/server.js'
 
 const DEFAULT_CONFIG: GeneratorConfig = {
   factories: {},

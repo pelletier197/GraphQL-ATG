@@ -1,4 +1,4 @@
-import { GraphQLClient, GraphQLVariables } from '@lib/core/graphql/client'
+import { GraphQLClient, GraphQLVariables } from '@lib/core/graphql/client.js'
 import { ClientError, GraphQLClient as NativeClient } from 'graphql-request'
 
 export type Headers = {

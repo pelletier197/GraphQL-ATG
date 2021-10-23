@@ -41,6 +41,7 @@
         }
       }
     ],
+    "import/extensions": ["error", "always"],
     "sort-imports": [
       "error",
       {

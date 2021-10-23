@@ -1,4 +1,4 @@
-import gql from '@lib/core/graphql/gql'
+import gql from '@lib/core/graphql/gql.js'
 
 export const INTROSPECTION_QUERY = gql`
   query IntrospectionQuery($includeDeprecated: Boolean) {

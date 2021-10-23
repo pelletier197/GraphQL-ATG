@@ -1,9 +1,9 @@
-import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client'
-import { GraphQLQuery } from '@lib/core/graphql/query/query'
-import { newMultiTask } from '@lib/core/task/task'
+import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client.js'
+import { GraphQLQuery } from '@lib/core/graphql/query/query.js'
+import { newMultiTask } from '@lib/core/task/task.js'
 
-import { RunnerConfig } from './config'
-import { FailedGraphQLRequestError } from './error'
+import { RunnerConfig } from './config.js'
+import { FailedGraphQLRequestError } from './error.js'
 
 export type QueryExecutionResultDetails = {
   /**

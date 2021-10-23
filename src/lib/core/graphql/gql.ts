@@ -1,7 +1,7 @@
 import compress from 'graphql-query-compress'
 import { gql as implementation } from 'graphql-request'
-import prettierGraphql from 'prettier/parser-graphql'
-import prettier from 'prettier/standalone'
+import prettierGraphql from 'prettier/parser-graphql.js'
+import prettier from 'prettier/standalone.js'
 
 export default function (chunks: TemplateStringsArray): string {
   return implementation(chunks)

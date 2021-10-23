@@ -1,7 +1,7 @@
 /* eslint-disable functional/immutable-data */
 
 import { Listr, ListrDefaultRendererOptions, ListrRendererValue } from 'listr2'
-import { TaskWrapper } from 'listr2/dist/lib/task-wrapper'
+import { TaskWrapper } from 'listr2/dist/lib/task-wrapper.js'
 
 const RENDERER_OPTIONS: ListrDefaultRendererOptions<ListrRendererValue> = {
   rendererOptions: {
