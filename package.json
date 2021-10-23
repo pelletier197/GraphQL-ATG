@@ -1,12 +1,13 @@
 {
   "name": "graphql-atg",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "GraphQL Automated Test Generator (ATG) generates automatic tests for you API by fetching the GraphQL introspection schema and by automatically generating requests for that API",
-  "main": "build/index.mjs",
+  "main": "build/index.js",
   "repository": "https://github.com/pelletier197/graphql-atg",
   "license": "MIT",
   "keywords": [],
   "type": "module",
+  "bin": "build/index.js",
   "scripts": {
     "start": "run-p build && cd build && node --experimental-specifier-resolution=node index",
     "start-test-server": "tsc -p tsconfig-testserver.json && tscpaths -p tsconfig-testserver.json -s . -o build-testserver && cp spec/lib/__utils__/farm/schema.json build-testserver/spec/lib/__utils__/farm && cd build-testserver/spec/lib/__utils__/farm; node --experimental-specifier-resolution=node -e 'import(\"./server.js\").then((module) => module.startFarmServer().then((server) => console.log(\"Running at \" + server.url)))'",
