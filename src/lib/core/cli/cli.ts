@@ -6,8 +6,10 @@ import { GraphQLAtgConfig } from '../atg/config'
 import { GraphQLFactory, NullGenerationStrategy } from '../atg/generator/config'
 
 export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
+  const version = process.env.npm_package_version || 'unknown'
+
   program
-    .version('1.0.0')
+    .version(version)
     .requiredOption(
       '-e, --endpoint <endpoint>',
       'The GraphQL endpoint to test against. '
