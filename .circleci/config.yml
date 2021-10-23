@@ -48,7 +48,12 @@ workflows:
     jobs:
       - 'node-16'
       - 'node-latest'
-  deploy:
-    jobs:
       - 'deploy':
           type: approval
+          requires:
+            - 'node-16'
+            - 'node-latest'
+          filters:
+            branches:
+              only: main
+
