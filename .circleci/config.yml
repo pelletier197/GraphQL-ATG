@@ -8,13 +8,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
-      - run: yarn
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn install --immutable
       - save_cache:
           paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+            - .yarn/cache
+            - .yarn/unplugged
+          key: yarn-packages-{{ checksum "yarn.lock" }}
       - run: yarn cov
   'node-latest':
     docker:
@@ -23,17 +23,32 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
-      - run: yarn
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn install --immutable
       - save_cache:
           paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+            - .yarn/cache
+            - .yarn/unplugged
+          key: yarn-packages-{{ checksum "yarn.lock" }}
       - run: yarn cov
+  'deploy':
+    docker:
+      - image: circleci/node:16
+    type: approval
+    requires:
+      - 'node-16'
+      - 'node-latest'
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn publish --non-interactive
+
 workflows:
   version: 2
   build:
     jobs:
       - 'node-16'
       - 'node-latest'
+      - 'deploy'

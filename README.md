@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main.svg?style=svg)](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main)
+
 <p align="center">
   <img src="./logo/logo.png">
 </p>
