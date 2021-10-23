@@ -14,6 +14,7 @@ jobs:
           paths:
             - .yarn/cache
             - .yarn/unplugged
+            - node_modules
           key: yarn-packages-{{ checksum "yarn.lock" }}
       - run: yarn build
       - save_cache:
