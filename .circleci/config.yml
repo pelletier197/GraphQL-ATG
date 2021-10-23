@@ -34,6 +34,7 @@ jobs:
   'deploy':
     docker:
       - image: circleci/node:16
+    type: approval
     steps:
       - checkout
       - restore_cache:
@@ -47,6 +48,8 @@ workflows:
     jobs:
       - 'node-16'
       - 'node-latest'
+  deploy:
+    jobs:
       - 'deploy':
         type: approval
         requires:
