@@ -52,6 +52,3 @@ workflows:
     jobs:
       - 'deploy':
           type: approval
-          requires:
-            - 'node-16'
-            - 'node-latest'
