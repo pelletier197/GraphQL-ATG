@@ -1,7 +1,7 @@
 # https://circleci.com/docs/2.0/language-javascript/
 version: 2
 jobs:
-  'test-node-16':
+  'build':
     docker:
       - image: circleci/node:16
     steps:
@@ -15,6 +15,19 @@ jobs:
             - .yarn/cache
             - .yarn/unplugged
           key: yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn build
+      - save_cache:
+          paths:
+            - build
+          key: yarn-build
+  'test-node-16':
+    docker:
+      - image: circleci/node:16
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
       - run: yarn test
   'test-node-latest':
     docker:
@@ -24,26 +37,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
-      - run: yarn install --immutable
-      - save_cache:
-          paths:
-            - .yarn/cache
-            - .yarn/unplugged
-          key: yarn-packages-{{ checksum "yarn.lock" }}
       - run: yarn test
-  'build':
-    docker:
-      - image: circleci/node:16
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
-      - run: yarn build
-      - save_cache:
-          paths:
-            - build
-          key: yarn-build
   'deploy':
     docker:
       - image: circleci/node:16
@@ -60,16 +54,18 @@ workflows:
   version: 2
   build:
     jobs:
-      - 'test-node-16'
-      - 'test-node-latest'
       - 'build'
+      - 'test-node-16'
           requires:
-          - 'test-node-16'
-          - 'test-node-latest'
+            - build
+      - 'test-node-latest'
+          requires:
+            - build
       - 'deploy-approval':
           type: approval
-    
-            - 'build'
+          requires:
+            - 'test-node-16'
+            - 'test-node-latest'
           filters:
             branches:
               only: main
