@@ -55,12 +55,12 @@ workflows:
   build:
     jobs:
       - 'build'
-      - 'test-node-16'
+      - 'test-node-16':
+          requires: 
+            - 'build'
+      - 'test-node-latest':
           requires:
-            - build
-      - 'test-node-latest'
-          requires:
-            - build
+            - 'build'
       - 'deploy-approval':
           type: approval
           requires:
