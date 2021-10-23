@@ -61,11 +61,13 @@ workflows:
     jobs:
       - 'test-node-16'
       - 'test-node-latest'
+      - 'build'
       - 'deploy-approval':
           type: approval
           requires:
             - 'test-node-16'
             - 'test-node-latest'
+            - 'build'
           filters:
             branches:
               only: main
