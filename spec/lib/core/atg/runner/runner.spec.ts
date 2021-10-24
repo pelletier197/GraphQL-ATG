@@ -6,6 +6,7 @@ import {
 } from '@lib/core/atg/runner/runner.js'
 import gql from '@lib/core/graphql/gql.js'
 import { GraphQLQuery } from '@lib/core/graphql/query/query.js'
+import { TaskContext } from '@lib/core/task/task.js'
 import { when } from 'jest-when'
 
 const graphqlRequest = jest.fn()
@@ -107,6 +108,21 @@ describe('executing graphql queries', () => {
         successful: 1,
         failed: 0,
       })
+    })
+
+    it('should call the before test hook and success hook in order', async () => {
+      await run()
+
+      const expectedContext = {
+        query: query,
+        task: expect.anything(),
+      }
+
+      expect(beforeTestHook).toHaveBeenCalledWith(expectedContext)
+      expect(onSuccessHook).toHaveBeenCalledWith(expectedContext)
+      expect(onFailHook).not.toHaveBeenCalled()
+
+      expect(beforeTestHook).toHaveBeenCalledBefore(onSuccessHook)
     })
   })
 })
