@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main.svg?style=svg)](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main)
+[![CircleCI](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main.svg?style=shield)](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main) [![License](https://img.shields.io/github/license/pelletier197/GraphQL-ATG)](https://github.com/pelletier197/GraphQL-ATG/blob/main/LICENSE)
 
 <p align="center">
   <img src="./logo/logo.png">
