@@ -1,11 +1,10 @@
-import { GraphQLIntrospectionResult } from '@lib/core/atg/introspection/types'
-import gql from '@lib/core/graphql/gql'
+import { GraphQLIntrospectionResult } from '@lib/core/atg/introspection/types.js'
+import gql from '@lib/core/graphql/gql.js'
 import omitDeep from 'omit-deep-lodash'
 
-import farmSchema from './schema.json'
+import { startTestServer, TestGraphQLServer } from '../server.js'
 
-import { startTestServer, TestGraphQLServer } from '../server'
-import _ from 'lodash'
+import farmSchema from './schema.json'
 
 enum AnimalNutrition {
   HERBIVORE,

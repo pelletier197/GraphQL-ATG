@@ -5,7 +5,6 @@ import {
   startFarmServer,
 } from '@test/__utils__/farm/server.js'
 import { lazy } from '@test/__utils__/lazy.js'
-import _ from 'lodash'
 
 const server = lazy(startFarmServer)
 const client = lazy(async () => createClient((await server()).url))

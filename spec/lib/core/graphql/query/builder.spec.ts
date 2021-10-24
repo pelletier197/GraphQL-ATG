@@ -1,9 +1,9 @@
-import gql, { minify, prettify } from '@lib/core/graphql/gql'
+import gql, { minify, prettify } from '@lib/core/graphql/gql.js'
 import {
   mutationBuilder,
   queryBuilder,
   subSelectionBuilder,
-} from '@lib/core/graphql/query/builder'
+} from '@lib/core/graphql/query/builder.js'
 
 describe('building a query', () => {
   const underTest = queryBuilder()

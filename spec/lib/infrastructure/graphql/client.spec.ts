@@ -1,11 +1,11 @@
-import gql from '@lib/core/graphql/gql'
-import { createClient } from '@lib/infrastructure/graphql/client'
+import gql from '@lib/core/graphql/gql.js'
+import { createClient } from '@lib/infrastructure/graphql/client.js'
 import {
   EXPECTED_ALL_ANIMALS_QUERY_RESULT,
   QUERY_ALL_ANIMALS,
   startFarmServer,
-} from '@test/__utils__/farm/server'
-import { lazy } from '@test/__utils__/lazy'
+} from '@test/__utils__/farm/server.js'
+import { lazy } from '@test/__utils__/lazy.js'
 
 const server = lazy(startFarmServer)
 const client = lazy(async () => createClient((await server()).url))
