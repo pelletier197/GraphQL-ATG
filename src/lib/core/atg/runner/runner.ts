@@ -148,7 +148,7 @@ async function runQuery(
     response: result,
   }
 
-  if (result.errors.length > 0) {
+  if (!details.isSuccessful) {
     notifyHooks(hooks, hookContext, (hook) => hook.onFail)
     throw new FailedGraphQLRequestError(details)
   }
