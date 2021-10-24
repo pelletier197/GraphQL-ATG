@@ -33,7 +33,8 @@
     "jobarea",
     "zipcode",
     "zipcodes",
-    "introspecter"
+    "introspecter",
+    "jsbits"
   ],
   "flagWords": [],
   "ignorePaths": [
