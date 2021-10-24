@@ -1,12 +1,17 @@
 import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client.js'
 import { GraphQLQuery } from '@lib/core/graphql/query/query.js'
 import { newMultiTask, TaskContext } from '@lib/core/task/task.js'
+import _ from 'lodash'
 
 import { RunnerConfig } from './config.js'
 import { FailedGraphQLRequestError } from './error.js'
 import { HookCallback, RunnerHook, RunnerHookContext } from './hooks/hook.js'
 
 export type QueryExecutionResultDetails = {
+  /**
+   * The index of the query in the list of queries to execute
+   */
+  readonly index: number
   /**
    * The query that was executed during this test
    */
@@ -64,7 +69,8 @@ export async function executeQueries(
     queries.map((query, index) => {
       return {
         name: `Query ${index + 1}`,
-        run: async (context) => await runQuery(query, client, context, hooks),
+        run: async (context) =>
+          await runQuery(index, query, client, context, hooks),
       }
     }),
     {
@@ -76,10 +82,16 @@ export async function executeQueries(
 
   try {
     const multiTaskResult = await task.start()
-    const allDetails = [
-      ...multiTaskResult.results,
-      ...multiTaskResult.errors.map((error) => convertError(error)),
-    ]
+    const allDetails = _.sortBy(
+      [
+        ...multiTaskResult.results,
+        ...multiTaskResult.errors.map((error) => convertError(error)),
+      ],
+      (detail) => detail.index
+    )
+
+    console.log('Not try catch')
+
     return {
       resultDetails: allDetails,
       failed: allDetails.filter((result) => !result.isSuccessful).length,
@@ -92,7 +104,6 @@ export async function executeQueries(
     }
   } catch (error) {
     const converted = convertError(error)
-
     return {
       executionTimeMilliseconds: converted.executionTimeMilliseconds,
       failed: 1,
@@ -126,6 +137,7 @@ async function notifyHooks(
 }
 
 async function runQuery(
+  index: number,
   query: GraphQLQuery,
   client: GraphQLClient,
   context: TaskContext,
@@ -141,7 +153,8 @@ async function runQuery(
   const before = new Date().getUTCMilliseconds()
   const result = await client.request(query.query, query.variables)
 
-  const details = {
+  const details: QueryExecutionResultDetails = {
+    index: index,
     executionTimeMilliseconds: new Date().getUTCMilliseconds() - before,
     isSuccessful: result.errors.length === 0,
     query: query,
