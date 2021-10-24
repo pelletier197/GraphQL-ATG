@@ -30,7 +30,7 @@
       "@test/*": ["spec/lib/*"]
     }
   },
-  "include": ["src/**/*.ts", "spec/**/*.spec.ts"],
+  "include": ["src/**/*.ts", "spec/**/*.ts"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }
