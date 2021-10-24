@@ -14,7 +14,7 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
     .version(getPackageVersion())
     .requiredOption(
       '-e, --endpoint <endpoint>',
-      'The GraphQL endpoint to test against. '
+      'The GraphQL endpoint to test against.'
     )
     .option(
       '-h, --header <header>=<value>',
@@ -24,7 +24,7 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
     )
     .option(
       '-iid, --introspection.include-deprecated',
-      'Wether or not the introspection should include the deprecated fields or not',
+      'Wether or not the introspection should include the deprecated fields or not.',
       true
     )
     .option(
@@ -42,7 +42,7 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
     .addOption(
       new Option(
         '-gns, --generation.null-strategy <strategy>',
-        'Allow specifying if the default behaviour for nullable input values when there is no factory provided is to always use null values, sometimes use null values, or never use null values'
+        'Allow specifying if the default behaviour for nullable input values when there is no factory provided is to always use null values, sometimes use null values, or never use null values.'
       )
         .choices([
           NullGenerationStrategy.NEVER_NULL,
@@ -53,13 +53,13 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
     )
     .option(
       '-rc, --runner.concurrency',
-      'The number of parallel queries to execute',
+      'The number of parallel queries to execute.',
       validatedParseInt,
       1
     )
     .option(
       '-rff, --runner.fail-fast',
-      'Either the tests should stop after the first error is encountered, or keep running until all queries have been executed',
+      'Either the tests should stop after the first error is encountered, or keep running until all queries have been executed.',
       false
     )
 
