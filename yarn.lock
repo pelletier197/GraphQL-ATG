@@ -4217,12 +4217,14 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.4:
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
 graphql-atg@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/graphql-atg/-/graphql-atg-1.0.4.tgz#4ed6dac212558064f4d503119cf1ec427c2f83b1"
-  integrity sha512-6u2+RqYRy7QaWNULxLQtRIIL6g37rcdTwUq9ozvjDedXwNR1XQbCs8Qhj98yRWNEZDHo0GjfgLWAhHokhnhOWg==
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/graphql-atg/-/graphql-atg-1.0.10.tgz#e773c0b7fd7fac5e3039dd05b66bfb165570c04b"
+  integrity sha512-Xs0ETDazW960zg9feygGUOHq4z/hy7OugFl1TpsS1VpQEJaij3cgNZnJ0EtDCKZu+IvN81pGYhOpoMbpbRSXZQ==
   dependencies:
     commander "^8.2.0"
     faker "^5.5.3"
+    graphql "^15.6.1"
+    graphql-atg "^1.0.4"
     graphql-formatter "^1.0.3"
     graphql-query-compress "^1.2.4"
     graphql-request "^3.6.0"
