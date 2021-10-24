@@ -1,9 +1,10 @@
 import { GraphQLClient, GraphQLResponse } from '@lib/core/graphql/client.js'
 import { GraphQLQuery } from '@lib/core/graphql/query/query.js'
-import { newMultiTask } from '@lib/core/task/task.js'
+import { newMultiTask, TaskContext } from '@lib/core/task/task.js'
 
 import { RunnerConfig } from './config.js'
 import { FailedGraphQLRequestError } from './error.js'
+import { HookCallback, RunnerHook, RunnerHookContext } from './hooks/hook.js'
 
 export type QueryExecutionResultDetails = {
   /**
@@ -54,6 +55,7 @@ const DEFAULT_RUNNER_CONFIG: RunnerConfig = {
 export async function executeQueries(
   client: GraphQLClient,
   queries: ReadonlyArray<GraphQLQuery>,
+  hooks: ReadonlyArray<RunnerHook>,
   config?: Partial<RunnerConfig>
 ): Promise<QueryExecutionResults> {
   const actualConfig = Object.assign({}, DEFAULT_RUNNER_CONFIG, config)
@@ -62,7 +64,7 @@ export async function executeQueries(
     queries.map((query, index) => {
       return {
         name: `Query ${index + 1}`,
-        run: async () => await runQuery(query, client),
+        run: async (context) => await runQuery(query, client, context, hooks),
       }
     }),
     {
@@ -108,10 +110,34 @@ function convertError(error: unknown): QueryExecutionResultDetails {
   throw error
 }
 
+async function notifyHooks(
+  hooks: ReadonlyArray<RunnerHook>,
+  context: RunnerHookContext,
+  extractor: (hook: RunnerHook) => HookCallback | undefined
+) {
+  return await Promise.all(
+    hooks.map(async (hook) => {
+      const callback = extractor(hook)
+      if (callback) {
+        return await callback(context)
+      }
+    })
+  )
+}
+
 async function runQuery(
   query: GraphQLQuery,
-  client: GraphQLClient
+  client: GraphQLClient,
+  context: TaskContext,
+  hooks: ReadonlyArray<RunnerHook>
 ): Promise<QueryExecutionResultDetails> {
+  const hookContext: RunnerHookContext = {
+    query: query,
+    task: context,
+  }
+
+  notifyHooks(hooks, hookContext, (hook) => hook.beforeTest)
+
   const before = new Date().getUTCMilliseconds()
   const result = await client.request(query.query, query.variables)
 
@@ -123,8 +149,10 @@ async function runQuery(
   }
 
   if (result.errors.length > 0) {
+    notifyHooks(hooks, hookContext, (hook) => hook.onFail)
     throw new FailedGraphQLRequestError(details)
   }
 
+  notifyHooks(hooks, hookContext, (hook) => hook.onSuccess)
   return details
 }
