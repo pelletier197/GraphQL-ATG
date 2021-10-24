@@ -7,6 +7,12 @@ import { RunnerConfig } from './config.js'
 import { FailedGraphQLRequestError } from './error.js'
 import { HookCallback, RunnerHook, RunnerHookContext } from './hooks/hook.js'
 
+export enum QueryExecutionStatus {
+  SUCCESSFUL = 'SUCCESSFUL',
+  FAILED = 'FAILED',
+  SKIPPED = 'SKIPPED',
+}
+
 export type QueryExecutionResultDetails = {
   /**
    * The index of the query in the list of queries to execute
@@ -17,17 +23,17 @@ export type QueryExecutionResultDetails = {
    */
   readonly query: GraphQLQuery
   /**
+   * Wether the task was successful, failed or was skipped
+   */
+  readonly status: QueryExecutionStatus
+  /**
    * This response received when sending the query
    */
-  readonly response: GraphQLResponse<unknown>
-  /**
-   * WetherTaskContext or not the request was successful
-   */
-  readonly isSuccessful: boolean
+  readonly response?: GraphQLResponse<unknown>
   /**
    * The number of time the request took to complete in ms
    */
-  readonly executionTimeMilliseconds: number
+  readonly executionTimeMilliseconds?: number
 }
 
 export type QueryExecutionResults = {
@@ -45,6 +51,11 @@ export type QueryExecutionResults = {
    * The number of failed requests
    */
   readonly failed: number
+
+  /**
+   * The number of skipped requests
+   */
+  readonly skipped: number
 
   /**
    * The total execution time for all the test suite.
@@ -80,36 +91,42 @@ export async function executeQueries(
     }
   )
 
-  try {
-    const multiTaskResult = await task.start()
-    const allDetails = _.sortBy(
-      [
-        ...multiTaskResult.results,
-        ...multiTaskResult.errors.map((error) => convertError(error)),
-      ],
-      (detail) => detail.index
-    )
+  const multiTaskResult = await task.start()
+  const results = multiTaskResult.results
+  const errors = multiTaskResult.errors.map((error) => convertError(error))
 
-    console.log('Not try catch')
+  const allExpectedIndexes = queries.map((_, index) => index)
+  const allReceivedIndexes = [...results, ...errors].map(
+    (detail) => detail.index
+  )
 
-    return {
-      resultDetails: allDetails,
-      failed: allDetails.filter((result) => !result.isSuccessful).length,
-      successful: allDetails.filter((result) => result.isSuccessful).length,
-      executionTimeMilliseconds: allDetails.reduce(
-        (previous: number, current: QueryExecutionResultDetails) =>
-          previous + current.executionTimeMilliseconds,
-        0
+  const allDetails = _.sortBy(
+    [
+      ...results,
+      ...errors,
+      ..._.difference(allExpectedIndexes, allReceivedIndexes).map((index) =>
+        createSkippedResult(index, queries[index])
       ),
-    }
-  } catch (error) {
-    const converted = convertError(error)
-    return {
-      executionTimeMilliseconds: converted.executionTimeMilliseconds,
-      failed: 1,
-      successful: 0,
-      resultDetails: [converted],
-    }
+    ],
+    (detail) => detail.index
+  )
+
+  return {
+    resultDetails: allDetails,
+    failed: allDetails.filter(
+      (result) => result.status === QueryExecutionStatus.FAILED
+    ).length,
+    successful: allDetails.filter(
+      (result) => result.status === QueryExecutionStatus.SUCCESSFUL
+    ).length,
+    skipped: allDetails.filter(
+      (result) => result.status === QueryExecutionStatus.SKIPPED
+    ).length,
+    executionTimeMilliseconds: allDetails.reduce(
+      (previous: number, current: QueryExecutionResultDetails) =>
+        previous + (current.executionTimeMilliseconds || 0),
+      0
+    ),
   }
 }
 
@@ -119,6 +136,19 @@ function convertError(error: unknown): QueryExecutionResultDetails {
   }
 
   throw error
+}
+
+function createSkippedResult(
+  index: number,
+  query: GraphQLQuery
+): QueryExecutionResultDetails {
+  return {
+    status: QueryExecutionStatus.SKIPPED,
+    query,
+    index,
+    response: undefined,
+    executionTimeMilliseconds: undefined,
+  }
 }
 
 async function notifyHooks(
@@ -156,12 +186,15 @@ async function runQuery(
   const details: QueryExecutionResultDetails = {
     index: index,
     executionTimeMilliseconds: new Date().getUTCMilliseconds() - before,
-    isSuccessful: result.errors.length === 0,
+    status:
+      result.errors.length === 0
+        ? QueryExecutionStatus.SUCCESSFUL
+        : QueryExecutionStatus.FAILED,
     query: query,
     response: result,
   }
 
-  if (!details.isSuccessful) {
+  if (details.status !== QueryExecutionStatus.SUCCESSFUL) {
     notifyHooks(hooks, hookContext, (hook) => hook.onFail)
     throw new FailedGraphQLRequestError(details)
   }

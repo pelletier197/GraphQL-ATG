@@ -3,6 +3,7 @@ import { RunnerHook } from '@lib/core/atg/runner/hooks/hook.js'
 import {
   executeQueries,
   QueryExecutionResults,
+  QueryExecutionStatus,
 } from '@lib/core/atg/runner/runner.js'
 import gql from '@lib/core/graphql/gql.js'
 import { GraphQLQuery } from '@lib/core/graphql/query/query.js'
@@ -69,9 +70,9 @@ describe('executing graphql queries', () => {
         },
       ],
       {
-        ...context?.config,
         concurrency: 1,
         failFast: false,
+        ...context?.config,
       }
     )
   }
@@ -88,7 +89,7 @@ describe('executing graphql queries', () => {
         )
     })
 
-    it('should return a result with all queries that succeeded', async () => {
+    it('should return a result with all the query results', async () => {
       const result = await run()
 
       expect(result).toEqual({
@@ -96,7 +97,7 @@ describe('executing graphql queries', () => {
           {
             index: 0,
             query: query,
-            isSuccessful: true,
+            status: QueryExecutionStatus.SUCCESSFUL,
             executionTimeMilliseconds: expect.toSatisfy(
               (value: number) => value >= 0
             ),
@@ -111,10 +112,11 @@ describe('executing graphql queries', () => {
         ),
         successful: 1,
         failed: 0,
+        skipped: 0,
       })
     })
 
-    it('should call the before test hook and success hook in order', async () => {
+    it('should call the hooks in order', async () => {
       await run()
 
       const expectedContext = {
@@ -183,7 +185,7 @@ describe('executing graphql queries', () => {
             {
               index: 0,
               query: query,
-              isSuccessful: true,
+              status: QueryExecutionStatus.SUCCESSFUL,
               executionTimeMilliseconds: expect.toSatisfy(
                 (value: number) => value >= 0
               ),
@@ -195,7 +197,7 @@ describe('executing graphql queries', () => {
             {
               index: 1,
               query: secondQuery,
-              isSuccessful: false,
+              status: QueryExecutionStatus.FAILED,
               executionTimeMilliseconds: expect.toSatisfy(
                 (value: number) => value >= 0
               ),
@@ -207,7 +209,7 @@ describe('executing graphql queries', () => {
             {
               index: 2,
               query: thirdQuery,
-              isSuccessful: true,
+              status: QueryExecutionStatus.SUCCESSFUL,
               executionTimeMilliseconds: expect.toSatisfy(
                 (value: number) => value >= 0
               ),
@@ -222,6 +224,7 @@ describe('executing graphql queries', () => {
           ),
           successful: 2,
           failed: 1,
+          skipped: 0,
         })
       })
 
@@ -256,6 +259,97 @@ describe('executing graphql queries', () => {
 
         expect(beforeTestHook).toHaveBeenNthCalledWith(3, thirdContext)
         expect(onSuccessHook).toHaveBeenNthCalledWith(2, thirdContext)
+        expect(onFailHook).not.toHaveBeenCalledWith(thirdContext)
+      })
+    })
+
+    describe('fail fast mode is activated', () => {
+      const config: Partial<RunnerConfig> = {
+        failFast: true,
+      }
+
+      it('should return a result with all queries that succeeded', async () => {
+        const result = await run({
+          queries: [query, secondQuery, thirdQuery],
+          config: config,
+        })
+
+        console.log(result)
+
+        expect(result).toEqual({
+          resultDetails: [
+            {
+              index: 0,
+              query: query,
+              status: QueryExecutionStatus.SUCCESSFUL,
+              executionTimeMilliseconds: expect.toSatisfy(
+                (value: number) => value >= 0
+              ),
+              response: {
+                data: queryResults,
+                errors: [],
+              },
+            },
+            {
+              index: 1,
+              query: secondQuery,
+              status: QueryExecutionStatus.FAILED,
+              executionTimeMilliseconds: expect.toSatisfy(
+                (value: number) => value >= 0
+              ),
+              response: {
+                data: undefined,
+                errors: [error],
+              },
+            },
+            {
+              index: 2,
+              query: thirdQuery,
+              status: QueryExecutionStatus.SKIPPED,
+              executionTimeMilliseconds: undefined,
+              response: undefined,
+            },
+          ],
+          executionTimeMilliseconds: expect.toSatisfy(
+            (value: number) => value >= 0
+          ),
+          successful: 1,
+          failed: 1,
+          skipped: 1,
+        })
+      })
+
+      it('should call the before test hook and success hook in order for all queries', async () => {
+        await run({
+          queries: [query, secondQuery, thirdQuery],
+          config: config,
+        })
+
+        const firstContext = {
+          query: query,
+          task: expect.anything(),
+        }
+
+        const secondContext = {
+          query: secondQuery,
+          task: expect.anything(),
+        }
+
+        const thirdContext = {
+          query: thirdQuery,
+          task: expect.anything(),
+        }
+
+        expect(beforeTestHook).toHaveBeenNthCalledWith(1, firstContext)
+        expect(onSuccessHook).toHaveBeenNthCalledWith(1, firstContext)
+        expect(onFailHook).not.toHaveBeenCalledWith(firstContext)
+
+        expect(beforeTestHook).toHaveBeenNthCalledWith(2, secondContext)
+        expect(onSuccessHook).not.toHaveBeenCalledWith(secondContext)
+        expect(onFailHook).toHaveBeenNthCalledWith(1, secondContext)
+
+        expect(beforeTestHook).not.toHaveBeenCalledWith(thirdContext)
+        expect(onSuccessHook).not.toHaveBeenCalledWith(thirdContext)
         expect(onFailHook).not.toHaveBeenCalledWith(thirdContext)
       })
     })
