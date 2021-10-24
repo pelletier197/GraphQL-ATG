@@ -19,7 +19,7 @@ jobs:
       - save_cache:
           paths:
             - build
-          key: yarn-build
+          key: yarn-build-{{ .Revision }}
   'test-node-16':
     docker:
       - image: circleci/node:16
@@ -48,7 +48,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-build
+            - yarn-build-{{ .Revision }}
       - run: yarn publish --non-interactive
 
 workflows:
@@ -57,7 +57,7 @@ workflows:
     jobs:
       - 'build'
       - 'test-node-16':
-          requires: 
+          requires:
             - 'build'
       - 'test-node-latest':
           requires:
