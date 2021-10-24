@@ -28,6 +28,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn install --immutable
       - run: yarn test
   'test-node-latest':
     docker:
@@ -37,6 +38,7 @@ jobs:
       - restore_cache:
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: yarn install --immutable
       - run: yarn test
   'deploy':
     docker:
@@ -46,7 +48,6 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
             - yarn-build
       - run: yarn publish --non-interactive
 
@@ -55,12 +56,12 @@ workflows:
   build:
     jobs:
       - 'build'
-      - 'test-node-16'
+      - 'test-node-16':
+          requires: 
+            - 'build'
+      - 'test-node-latest':
           requires:
-            - build
-      - 'test-node-latest'
-          requires:
-            - build
+            - 'build'
       - 'deploy-approval':
           type: approval
           requires:
