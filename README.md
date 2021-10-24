@@ -1,4 +1,6 @@
-[![CircleCI](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main.svg?style=shield)](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main) [![License](https://img.shields.io/github/license/pelletier197/GraphQL-ATG)](https://github.com/pelletier197/GraphQL-ATG/blob/main/LICENSE)
+[![Circle-CI](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main.svg?style=shield)](https://circleci.com/gh/pelletier197/GraphQL-ATG/tree/main) [![License](https://img.shields.io/github/license/pelletier197/GraphQL-ATG)](https://github.com/pelletier197/GraphQL-ATG/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/npm/dw/graphql-atg)](https://www.npmjs.com/package/graphql-atg)
+[![Version](https://img.shields.io/npm/v/graphql-atg)](https://www.npmjs.com/package/graphql-atg)
 
 <p align="center">
   <img src="./logo/logo.png">
