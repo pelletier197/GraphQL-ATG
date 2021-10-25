@@ -2,7 +2,6 @@
 
 import { Listr, ListrDefaultRendererOptions, ListrRendererValue } from 'listr2'
 import { TaskWrapper } from 'listr2/dist/lib/task-wrapper.js'
-import { isContext } from 'vm'
 
 const RENDERER_OPTIONS: ListrDefaultRendererOptions<ListrRendererValue> = {
   rendererOptions: {

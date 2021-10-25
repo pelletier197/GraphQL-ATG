@@ -14,7 +14,7 @@ export class FailedGraphQLRequestError extends Error {
 
     super(
       `GraphQL request failed with errors 
-${details.response.errors.map((error) => `    - ${error.message}`)}
+${(details.response?.errors || []).map((error) => `    - ${error.message}`)}
 
 Query: ${tty ? minify(details.query.query) : prettify(details.query.query)}
 
