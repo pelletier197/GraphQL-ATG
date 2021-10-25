@@ -1,6 +1,6 @@
 {
   "name": "graphql-atg",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "description": "GraphQL Automated Test Generator (ATG) generates automatic tests for you API by fetching the GraphQL introspection schema and by automatically generating requests for that API",
   "repository": "https://github.com/pelletier197/graphql-atg",
   "license": "MIT",
