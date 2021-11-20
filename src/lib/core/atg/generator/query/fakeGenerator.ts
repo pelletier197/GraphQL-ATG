@@ -49,7 +49,10 @@ function generateInputParameter(
   return {
     name: input.name,
     type: typeToString(input.type),
-    value: generateInput(input, typesByName, config, context),
+    value: generateInput(input, typesByName, config, {
+      ...context,
+      path: `${context.path}$`,
+    }),
   }
 }
 
@@ -69,7 +72,9 @@ function generateInput(
     targetName: input.name,
     defaultValue: input.defaultValue,
     depth: context.depth,
-    path: `${context.path}.${input.name}`,
+    path: `${context.path}${context.path.endsWith('$') ? '' : '.'}${
+      input.name
+    }`,
   }
 
   return findMostSpecificFactory(
