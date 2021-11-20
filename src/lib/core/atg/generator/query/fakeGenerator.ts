@@ -29,10 +29,6 @@ import {
 import { GenerationContext } from './queryGenerator.js'
 import { TypesByName } from './types.js'
 
-type ParameterGenerationContext = {
-  readonly path: string
-}
-
 export function generateArgsForField(
   field: Field,
   typesByName: TypesByName,
@@ -40,9 +36,7 @@ export function generateArgsForField(
   context: GenerationContext
 ): ReadonlyArray<Parameter> {
   return field.args.map((argument) =>
-    generateInputParameter(argument, typesByName, config, {
-      path: `${context.path}.${argument.name}`,
-    })
+    generateInputParameter(argument, typesByName, config, context)
   )
 }
 
@@ -50,7 +44,7 @@ function generateInputParameter(
   input: InputValue,
   typesByName: TypesByName,
   config: GeneratorConfig,
-  context: ParameterGenerationContext
+  context: GenerationContext
 ): Parameter {
   return {
     name: input.name,
@@ -63,7 +57,7 @@ function generateInput(
   input: InputValue,
   typesByName: TypesByName,
   config: GeneratorConfig,
-  context: ParameterGenerationContext
+  context: GenerationContext
 ): unknown {
   // If you have a field [String!]!, this returns the factory for the string.
   const unwrappedType = unwrapType(input.type, typesByName)
@@ -71,25 +65,28 @@ function generateInput(
     ? DEFAULT_FACTORIES[unwrappedType.name]
     : undefined
 
-  const context = {
+  const factoryContext = {
     targetName: input.name,
     defaultValue: input.defaultValue,
+    depth: context.depth,
+    path: `${context.path}.${input.name}`
   }
 
   return findMostSpecificFactory(
     input.type,
     typesByName,
-    config
+    config,
+    context
   )({
-    ...context,
+    ...factoryContext,
     defaultFactory: defaultFactory
       ? {
-          provide: () => defaultFactory(context),
+          provide: () => defaultFactory(factoryContext),
         }
       : undefined,
     randomFactory: {
       provide: () => {
-        return randomFactory(unwrappedType, typesByName, config)(context)
+        return randomFactory(unwrappedType, typesByName, config, context)(factoryContext)
       },
     },
   })
@@ -99,6 +96,7 @@ function findMostSpecificFactory(
   argumentType: TypeRef,
   typesByName: TypesByName,
   config: GeneratorConfig,
+  context: GenerationContext,
   nullable = true
 ): GraphQLFactory {
   // Did the user provide a factory for this exact type?
@@ -113,6 +111,7 @@ function findMostSpecificFactory(
       unwrapNonNull(argumentType),
       typesByName,
       config,
+      context,
       false
     )
   }
@@ -132,7 +131,8 @@ function findMostSpecificFactory(
     const listElementFactory = findMostSpecificFactory(
       unwrapList(argumentType),
       typesByName,
-      config
+      config,
+      context
     )
     return (context) => [listElementFactory(context)]
   }
@@ -149,13 +149,14 @@ function findMostSpecificFactory(
   }
 
   // Factory that matches by wildcard
-  return randomFactory(unwrappedArgumentType, typesByName, config)
+  return randomFactory(unwrappedArgumentType, typesByName, config, context)
 }
 
 function randomFactory(
   argumentType: FullType,
   typesByName: TypesByName,
-  config: GeneratorConfig
+  config: GeneratorConfig,
+  context: GenerationContext,
 ): GraphQLFactory {
   if (argumentType.kind === Kind.ENUM) {
     if (!argumentType.enumValues) {
@@ -191,7 +192,7 @@ function randomFactory(
       return _.mapValues(
         _.keyBy(fields, (field) => field.name),
         (input: InputValue) => {
-          return generateInput(input, typesByName, config)
+          return generateInput(input, typesByName, config, context)
         }
       )
     }

@@ -122,7 +122,7 @@ function buildField(
     field,
     typesByName,
     config,
-    context,
+    context
   )
 
   const type = unwrapFieldType(field, typesByName)
