@@ -25,6 +25,11 @@ const DEFAULT_CONFIG: GeneratorConfig = {
   factories: {},
 }
 
+export type GenerationContext = {
+  readonly path: string
+  readonly depth: number
+}
+
 export async function generateGraphQLQueries(
   introspectionResult: GraphQLIntrospectionResult,
   config?: Partial<GeneratorConfig>
@@ -50,7 +55,10 @@ export async function generateGraphQLQueries(
 
       return rootQueryType.fields
         .map((field) => {
-          return buildField(initialBuilder, field, typesByName, mergedConfig, 1)
+          return buildField(initialBuilder, field, typesByName, mergedConfig, {
+            depth: 1,
+            path: field.name,
+          })
         })
         .filter((x) => x !== initialBuilder)
         .map((x) => x.build())
@@ -68,10 +76,10 @@ function generateField(
   type: FullType,
   typesByName: TypesByName,
   config: GeneratorConfig,
-  depth: number
+  context: GenerationContext
 ): QueryBuilder | null {
   // Go no further
-  if (depth >= config.maxDepth) {
+  if (context.depth >= config.maxDepth) {
     return null
   }
 
@@ -86,7 +94,10 @@ function generateField(
   const finalBuilderWithAllFields = _.reduce(
     fields,
     (memo: QueryBuilder, field: Field) => {
-      return buildField(memo, field, typesByName, config, depth)
+      return buildField(memo, field, typesByName, config, {
+        depth: context.depth,
+        path: `${context.path}.${field.name}`,
+      })
     },
     builder
   )
@@ -105,12 +116,13 @@ function buildField(
   field: Field,
   typesByName: TypesByName,
   config: GeneratorConfig,
-  depth: number
+  context: GenerationContext
 ): QueryBuilder {
   const parameters: ReadonlyArray<Parameter> = generateArgsForField(
     field,
     typesByName,
-    config
+    config,
+    context,
   )
 
   const type = unwrapFieldType(field, typesByName)
@@ -121,12 +133,10 @@ function buildField(
     return builder.withField(field.name, parameters)
   }
 
-  const generatedSubSelection = generateField(
-    type,
-    typesByName,
-    config,
-    depth + 1
-  )
+  const generatedSubSelection = generateField(type, typesByName, config, {
+    ...context,
+    depth: context.depth + 1,
+  })
 
   if (generatedSubSelection === null) {
     // No new field in the builder, as we can't select any sub field due to max depth

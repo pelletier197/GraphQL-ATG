@@ -65,6 +65,17 @@ export type GraphQLFactoryContext = {
    * The random factory that would be used to generate this object. This can be useful to fallback on a random object.
    */
   readonly randomFactory?: GraphQLFactoryContextDefault
+
+  /**
+   * The current depth in the field generation. This does not include the depth of the current parameter.
+   */
+  readonly depth: number
+
+  /**
+   * Path in the query to the current parameter. It is composed of two parts.
+   * <query_path>$<parameter_path>
+   */
+  readonly path: string
 }
 
 export type GraphQLFactoryContextDefault = {

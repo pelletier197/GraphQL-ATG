@@ -26,34 +26,44 @@ import {
   unwrapNonNull,
   unwrapType,
 } from './extractor.js'
+import { GenerationContext } from './queryGenerator.js'
 import { TypesByName } from './types.js'
+
+type ParameterGenerationContext = {
+  readonly path: string
+}
 
 export function generateArgsForField(
   field: Field,
   typesByName: TypesByName,
-  config: GeneratorConfig
+  config: GeneratorConfig,
+  context: GenerationContext
 ): ReadonlyArray<Parameter> {
   return field.args.map((argument) =>
-    generateInputParameter(argument, typesByName, config)
+    generateInputParameter(argument, typesByName, config, {
+      path: `${context.path}.${argument.name}`,
+    })
   )
 }
 
 function generateInputParameter(
   input: InputValue,
   typesByName: TypesByName,
-  config: GeneratorConfig
+  config: GeneratorConfig,
+  context: ParameterGenerationContext
 ): Parameter {
   return {
     name: input.name,
     type: typeToString(input.type),
-    value: generateInput(input, typesByName, config),
+    value: generateInput(input, typesByName, config, context),
   }
 }
 
 function generateInput(
   input: InputValue,
   typesByName: TypesByName,
-  config: GeneratorConfig
+  config: GeneratorConfig,
+  context: ParameterGenerationContext
 ): unknown {
   // If you have a field [String!]!, this returns the factory for the string.
   const unwrappedType = unwrapType(input.type, typesByName)
