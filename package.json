@@ -113,7 +113,9 @@
       "lcov",
       "text"
     ],
-    "setupFilesAfterEnv": ["jest-extended/all"]
+    "setupFilesAfterEnv": [
+      "jest-extended/all"
+    ]
   },
   "config": {
     "commitizen": {

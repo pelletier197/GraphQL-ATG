@@ -274,8 +274,6 @@ describe('executing graphql queries', () => {
           config: config,
         })
 
-        console.log(result)
-
         expect(result).toEqual({
           resultDetails: [
             {

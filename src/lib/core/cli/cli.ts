@@ -39,6 +39,17 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
       convertToFactoriesFile,
       []
     )
+    .option(
+      '-rc, --runner.concurrency <count>',
+      'The number of parallel queries to execute.',
+      validatedParseInt,
+      1
+    )
+    .option(
+      '-rff, --runner.fail-fast',
+      'Either the tests should stop after the first error is encountered, or keep running until all queries have been executed.',
+      false
+    )
     .addOption(
       new Option(
         '-gns, --generation.null-strategy <strategy>',
@@ -50,17 +61,6 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
           NullGenerationStrategy.SOMETIMES_NULL,
         ])
         .default(NullGenerationStrategy.NEVER_NULL)
-    )
-    .option(
-      '-rc, --runner.concurrency',
-      'The number of parallel queries to execute.',
-      validatedParseInt,
-      1
-    )
-    .option(
-      '-rff, --runner.fail-fast',
-      'Either the tests should stop after the first error is encountered, or keep running until all queries have been executed.',
-      false
     )
 
   program.parse(process.argv)
