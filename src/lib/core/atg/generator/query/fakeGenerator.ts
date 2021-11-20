@@ -69,7 +69,7 @@ function generateInput(
     targetName: input.name,
     defaultValue: input.defaultValue,
     depth: context.depth,
-    path: `${context.path}.${input.name}`
+    path: `${context.path}.${input.name}`,
   }
 
   return findMostSpecificFactory(
@@ -86,7 +86,12 @@ function generateInput(
       : undefined,
     randomFactory: {
       provide: () => {
-        return randomFactory(unwrappedType, typesByName, config, context)(factoryContext)
+        return randomFactory(
+          unwrappedType,
+          typesByName,
+          config,
+          context
+        )(factoryContext)
       },
     },
   })
@@ -156,7 +161,7 @@ function randomFactory(
   argumentType: FullType,
   typesByName: TypesByName,
   config: GeneratorConfig,
-  context: GenerationContext,
+  context: GenerationContext
 ): GraphQLFactory {
   if (argumentType.kind === Kind.ENUM) {
     if (!argumentType.enumValues) {
