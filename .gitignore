@@ -10,4 +10,4 @@ coverage
 package-lock.json
 buildcache
 
-factory.js
+module.js

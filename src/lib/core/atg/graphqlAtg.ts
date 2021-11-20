@@ -15,5 +15,5 @@ export async function runGraphQLAtg(
     introspectionResult,
     config.generation
   )
-  return await executeQueries(client, allQueries, [], config.runner)
+  return await executeQueries(client, allQueries, config.runner)
 }

@@ -66,12 +66,12 @@ export type QueryExecutionResults = {
 const DEFAULT_RUNNER_CONFIG: RunnerConfig = {
   concurrency: 1,
   failFast: false,
+  hooks: [],
 }
 
 export async function executeQueries(
   client: GraphQLClient,
   queries: ReadonlyArray<GraphQLQuery>,
-  hooks: ReadonlyArray<RunnerHook>,
   config?: Partial<RunnerConfig>
 ): Promise<QueryExecutionResults> {
   const actualConfig = Object.assign({}, DEFAULT_RUNNER_CONFIG, config)
@@ -81,7 +81,7 @@ export async function executeQueries(
       return {
         name: `Query ${index + 1}`,
         run: async (context) =>
-          await runQuery(index, query, client, context, hooks),
+          await runQuery(index, query, client, context, actualConfig.hooks),
       }
     }),
     {
