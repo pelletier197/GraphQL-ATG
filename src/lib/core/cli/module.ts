@@ -1,5 +1,5 @@
 import { InvalidArgumentError } from 'commander'
-import _ from 'lodash'
+import { z } from 'zod'
 
 import { GraphQLFactory } from '../atg/generator/config.js'
 import { RunnerHook } from '../atg/runner/hooks/hook.js'
@@ -9,7 +9,16 @@ export type ExtensionModule = {
   readonly hooks: ReadonlyArray<RunnerHook>
 }
 
-// TODO - use IO-ts to validate the module received
+const Module = z.object({
+  factories: z.record(z.string(), z.function()),
+  hooks: z.array(
+    z.object({
+      beforeTest: z.optional(z.function()),
+      onSuccess: z.optional(z.function()),
+      onFail: z.optional(z.function()),
+    })
+  ),
+})
 
 export async function parseModules(
   modules: ReadonlyArray<string>
@@ -42,6 +51,8 @@ async function parseModule(value: string): Promise<ExtensionModule> {
   try {
     const configuration = (await import(value)).default
 
+    const result = Module.safeParse(configuration)
+    console.log(result)
     if (!(configuration instanceof Object)) {
       const specificError = `Expected default export to be of type Object, but was ${configuration} of type ${typeof configuration}`
       throw new InvalidArgumentError(`${specificError}\n\n${genericError}`)
