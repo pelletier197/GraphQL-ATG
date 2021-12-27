@@ -1,6 +1,8 @@
 import { GraphQLClient, GraphQLVariables } from '@lib/core/graphql/client.js'
 import { ClientError, GraphQLClient as NativeClient } from 'graphql-request'
 
+import { InvalidGraphQLResponseException } from './error.js'
+
 export type Headers = {
   readonly [name: string]: string
 }
@@ -25,10 +27,14 @@ export function createClient(
         }
       } catch (error) {
         if (error instanceof ClientError) {
-          return {
-            data: error.response.data,
-            errors: error.response.errors || [],
+          if (error.response.errors) {
+            return {
+              data: error.response.data,
+              errors: error.response.errors,
+            }
           }
+
+          throw new InvalidGraphQLResponseException(endpoint, error.response)
         }
 
         throw error

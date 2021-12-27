@@ -1,4 +1,5 @@
 import { InvalidArgumentError } from 'commander'
+import _ from 'lodash'
 import { z } from 'zod'
 
 import { GraphQLFactory } from '../atg/generator/config.js'
@@ -40,25 +41,17 @@ export async function parseModules(
 }
 
 async function parseModule(value: string): Promise<ExtensionModule> {
-  const genericError = `
-        Invalid factories configuration. Ensure your default export is an object with strings as keys and functions as values.
-        Example: 
-          export default {
-              'Paging': (context) => ({ first: 10, skip: 0 })
-          }
-      `.trimStart()
-
   try {
     const configuration = (await import(value)).default
 
     const result = Module.safeParse(configuration)
-    console.log(result)
-    if (!(configuration instanceof Object)) {
-      const specificError = `Expected default export to be of type Object, but was ${configuration} of type ${typeof configuration}`
-      throw new InvalidArgumentError(`${specificError}\n\n${genericError}`)
+
+    if (result.success) {
+      return result.data as ExtensionModule
     }
 
-    return configuration
+    const message = formatMessage(result.error, value)
+    throw new InvalidArgumentError(message)
   } catch (error) {
     if (error instanceof InvalidArgumentError) {
       throw error
@@ -68,4 +61,33 @@ async function parseModule(value: string): Promise<ExtensionModule> {
       `Module could not be imported. Make sure it exists and that it is a valid javascript file: ${error}`
     )
   }
+}
+
+function formatPath(path: ReadonlyArray<string | number>): string {
+  return _.reduce(
+    path,
+    (accumulator: string, current: string | number) => {
+      if (typeof current === 'number') {
+        return accumulator + `[${current}]`
+      }
+
+      if (
+        accumulator.length === 0 ||
+        accumulator[accumulator.length - 1] === ']'
+      ) {
+        return accumulator + current
+      }
+
+      return accumulator + `.${current}`
+    },
+    ''
+  )
+}
+
+function formatMessage(error: z.ZodError<unknown>, modulePath: string): string {
+  const messages = error.issues.map(
+    (issue) => `${issue.message} at path ${formatPath(issue.path)}`
+  )
+  const formattedErrors = messages.map((m) => `\t - ${m}`).join('\n')
+  return `${messages.length} errors were found with the module at path ${modulePath}:\n${formattedErrors}`
 }

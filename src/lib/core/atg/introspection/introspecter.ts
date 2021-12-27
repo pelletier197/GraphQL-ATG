@@ -23,7 +23,7 @@ export async function introspect(
 
       if (!result.data || result.errors?.length > 0) {
         throw new GraphQLQueryError(
-          'expected introspection result to contain data and no errors, but did not',
+          'Expected introspection result to contain data and no errors, but did not',
           result
         )
       }
