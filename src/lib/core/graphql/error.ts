@@ -10,7 +10,7 @@ export class GraphQLQueryError<T> extends Error {
     const errorsFormatted = response.errors
       ?.map((error) => `\t- ${error.message}`)
       ?.join('\n')
-    
+
     super(`
 ${message}
 --------------------------------
