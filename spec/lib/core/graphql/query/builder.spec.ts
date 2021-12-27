@@ -214,7 +214,7 @@ describe('building a query', () => {
                 {
                   name: 'arg',
                   type: 'Boolean!',
-                  value: true,
+                  value: false,
                 },
               ])
             )
@@ -244,6 +244,15 @@ describe('building a query', () => {
             }
           `
         )
+      })
+
+      it('should map variables correctly', () => {
+        expect(result.variables).toEqual({
+          arg: 'value',
+          arg2: 2,
+          arg3: true,
+          arg4: false,
+        })
       })
     })
   })

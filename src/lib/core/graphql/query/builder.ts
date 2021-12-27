@@ -76,7 +76,10 @@ export class QueryBuilder {
     return {
       query: `${this.type} ${this.name}${variablePlaceholder}${subSelection.query}`,
       variables: _.mapValues(
-        _.keyBy(subSelection.variables, (variable: Parameter) => variable.name),
+        _.keyBy(
+          subSelection.variables,
+          (variable: VariableParameter) => variable.variableName
+        ),
         (variable: Parameter) => variable.value
       ),
     }
