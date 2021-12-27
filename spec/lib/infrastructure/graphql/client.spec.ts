@@ -45,7 +45,6 @@ describe('running a request to the server', () => {
       expect(result.errors.map((error) => error.message)).toEqual([
         `Cannot query field "names" on type "Animals".`,
       ])
-      expect(result.errors[0].locations).toBeTruthy()
     })
   })
 })

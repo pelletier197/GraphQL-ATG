@@ -62,16 +62,16 @@ describe('executing graphql queries', () => {
         request: graphqlRequest,
       },
       context?.queries ?? [query],
-      [
-        context?.hook ?? {
-          beforeTest: beforeTestHook,
-          onSuccess: onSuccessHook,
-          onFail: onFailHook,
-        },
-      ],
       {
         concurrency: 1,
         failFast: false,
+        hooks: [
+          context?.hook ?? {
+            beforeTest: beforeTestHook,
+            onSuccess: onSuccessHook,
+            onFail: onFailHook,
+          },
+        ],
         ...context?.config,
       }
     )
