@@ -16,7 +16,11 @@ async function run() {
         process.exit(error.exitCode)
       }
 
-      console.log(error.message)
+      // Error is going to be displayed by the task manager
+      if (!process.stdout.isTTY) {
+        console.log(error.message)
+      }
+
       process.exit(1)
     }
 

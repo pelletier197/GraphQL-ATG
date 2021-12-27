@@ -69,7 +69,7 @@ export async function getAtgConfiguration(): Promise<GraphQLAtgConfig> {
 
   return {
     endpoint: options['endpoint'],
-    headers: options['headers'],
+    headers: options['header'],
     introspection: {
       includeDeprecated: options['introspection.includeDeprecated'],
     },

@@ -89,7 +89,7 @@ export function newMultiTask<T>(
       },
     },
     {
-      concurrent: config.concurrency,
+      concurrent: false,
       exitOnError: config.exitOnError,
       ...RENDERER_OPTIONS,
     }
