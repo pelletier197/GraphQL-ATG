@@ -49,6 +49,8 @@
     "zod": "^3.11.6"
   },
   "devDependencies": {
+    "@antora/cli": "3.0.0",
+    "@antora/site-generator": "3.0.0",
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-typescript": "^7.15.0",
     "@types/faker": "^5.5.9",

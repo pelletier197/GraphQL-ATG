@@ -1,0 +1,14 @@
+site:
+  title: GraphQL ATG
+  start_page: atg::index.adoc
+  url: http://localhost:3000
+
+content:
+  sources:
+    - url: .
+      start_path: docs/content
+
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true

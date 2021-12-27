@@ -1,0 +1,3 @@
+= Welcome
+
+Welcome to GraphQL ATG Documentation. GraphQL ATG is an automated test generator for your GraphQL API that uses the introspection query to generate random queries for your API. It allows to granularly customize the inputs passed to the queries and custom test event listeners (hooks).
