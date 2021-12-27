@@ -154,6 +154,7 @@ function findMostSpecificFactory(
     unwrappedArgumentType.name,
     config
   )
+
   if (wildCardFactory) {
     return wildCardFactory
   }
